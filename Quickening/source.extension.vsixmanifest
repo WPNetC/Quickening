@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="Quickening.Sid James.85c9c2c1-60d2-42cc-a5cf-3fd43be48d4f" Version="1.0" Language="en-US" Publisher="Sid James" />
+    <DisplayName>Quickening</DisplayName>
+    <Description>Empty VSIX Project.</Description>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+</PackageManifest>
