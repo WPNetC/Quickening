@@ -5,10 +5,25 @@
   <Extern href="vsshlids.h"/>
 
   <Commands package="guidAddWebDefaultsPackage">
+    <Groups>
+      <!--Project node context menu group-->
+      <Group guid="guidAddWebDefaultsPackageCmdSet" id="ProjNodeGroup" priority="0x0500">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
+      </Group>
+      <!--Top level menu group within project node-->
+      <Group guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenuGroup" priority="0x0600">
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenu"/>
+      </Group>
+      <!--Sub menu group-->
+      <Group guid="guidAddWebDefaultsPackageCmdSet" id="SubMenuGroup" priority="0x0000">
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="SubMenu"/>
+      </Group>
+    </Groups>
+
     <Menus>
       <!--Top level menu with parent set to project node group-->
       <Menu guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenu" priority="0x200" type="Menu">
-        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="ProjMenuGroup" />
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="ProjNodeGroup" />
         <Strings>
           <ButtonText>TestMenu</ButtonText>
           <CommandName>TestMenu</CommandName>
@@ -24,28 +39,13 @@
       </Menu>
     </Menus>
 
-    <Groups>
-      <!--Project node context menu group-->
-      <Group guid="guidAddWebDefaultsPackageCmdSet" id="ProjMenuGroup" priority="0x0500">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE"/>
-      </Group>
-      <!--Top level menu group-->
-      <Group guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenuGroup" priority="0x0600">
-        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenu"/>
-      </Group>
-      <!--Sub menu group-->
-      <Group guid="guidAddWebDefaultsPackageCmdSet" id="SubMenuGroup" priority="0x0000">
-        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="SubMenu"/>
-      </Group>
-    </Groups>
-
     <Buttons>
       <!--Button directly in project context menu group-->
       <Button guid="guidAddWebDefaultsPackageCmdSet" id="cmdidAddWebDefaults" priority="0x0100" type="Button">
-        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="ProjMenuGroup" />
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="ProjNodeGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>Invoke AddWebDefaults</ButtonText>
+          <ButtonText>Add Base Web Structure</ButtonText>
           <CommandName>TestMenu</CommandName>
         </Strings>
       </Button>
@@ -70,7 +70,7 @@
 
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidAddWebDefaultsPackageCmdSet" value="{dd7b9b46-7e8c-48a4-992f-905556b5ad36}">
-      <IDSymbol value="0x1022" name="ProjMenuGroup" />
+      <IDSymbol value="0x1022" name="ProjNodeGroup" />
       <IDSymbol value="0x1020" name="TopLevelMenuGroup" />
       <IDSymbol value="0x1150" name="SubMenuGroup" />
       <IDSymbol value="0x1021" name="TopLevelMenu" />

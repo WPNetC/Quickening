@@ -9,6 +9,9 @@ using System.ComponentModel.Design;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Quickening.Services;
+using System.Windows.Forms;
+using System.IO;
 
 namespace Quickening
 {
@@ -51,7 +54,7 @@ namespace Quickening
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddWebDefaults);
-                var menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+                var menuItem = new MenuCommand(AddWebDefaultsCallback, menuCommandID);
                 commandService.AddCommand(menuItem);
 
                 var subCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidTestSubCmd);
@@ -89,26 +92,29 @@ namespace Quickening
             Instance = new AddWebDefaults(package);
         }
 
-        /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
-        /// </summary>
-        /// <param name="sender">Event sender.</param>
-        /// <param name="e">Event args.</param>
-        private void MenuItemCallback(object sender, EventArgs e)
+        private void AddWebDefaultsCallback(object sender, EventArgs e)
         {
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "AddWebDefaults";
+            var title = "Add Web Defaults";
+            var message = "Add default web structure?";
 
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.ServiceProvider,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            var dr = MessageBox.Show(message, title, MessageBoxButtons.YesNo);
+
+            if (dr == DialogResult.Yes)
+            {
+                message = Directory.Exists(ProjectService.TemplatesDirectory) ? ProjectService.TemplatesDirectory : "Error";
+                var ps = new ParserService();
+                var list = ps.PaseXML(Path.Combine(ProjectService.XmlDirectory, "web-basic.xml"), false);
+
+                // Show a message box to prove we were here
+                var result = VsShellUtilities.ShowMessageBox(
+                    this.ServiceProvider,
+                    message,
+                    title,
+                    OLEMSGICON.OLEMSGICON_INFO,
+                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
+
         }
 
         private void SubItemCallback(object sender, EventArgs e)
