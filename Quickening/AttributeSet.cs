@@ -19,7 +19,7 @@ namespace Quickening
         /// If the file or folder should be included in the solution.
         /// <para>Defaults to true.</para>
         /// </summary>
-        public bool Include { get; private set; } 
+        public bool Include { get; private set; }
         
         private AttributeSet(string id, bool include)
         {

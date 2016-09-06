@@ -24,7 +24,10 @@ namespace Quickening
         /// Command IDs.
         /// </summary>
         public const int cmdidAddWebDefaults = 0x0100;
-        public const int cmdidTestSubCmd = 0x105;
+        public const int cmdidAddAngularModule = 0x105;
+        public const int cmdidAddAngularController = 0x106;
+        public const int cmdidAddAngularDirective = 0x107;
+        public const int cmdidAddAngularService = 0x108;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -35,6 +38,7 @@ namespace Quickening
         /// VS Package that provides this command, not null.
         /// </summary>
         private readonly Package package;
+        private CommandID webDefaultsCommandID;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AddWebDefaults"/> class.
@@ -53,13 +57,25 @@ namespace Quickening
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                var menuCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddWebDefaults);
-                var menuItem = new MenuCommand(AddWebDefaultsCallback, menuCommandID);
-                commandService.AddCommand(menuItem);
+                var webDefaultsCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddWebDefaults);
+                var awdMenuItem = new MenuCommand(AddWebDefaultsCallback, webDefaultsCommandID);
+                commandService.AddCommand(awdMenuItem);
 
-                var subCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidTestSubCmd);
-                var subItem = new MenuCommand(SubItemCallback, subCommandID);
-                commandService.AddCommand(subItem);
+                var angularModuleCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularModule);
+                var aamMenuItem = new MenuCommand(AddAngularModuleCallback, angularModuleCommandID);
+                commandService.AddCommand(aamMenuItem);
+
+                var angularControllerCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularController);
+                var aacMenuItem = new MenuCommand(AddAngularControllerCallback, angularControllerCommandID);
+                commandService.AddCommand(aacMenuItem);
+
+                var angularServiceCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularService);
+                var aasMenuItem = new MenuCommand(AddAngularServiceCallback, angularServiceCommandID);
+                commandService.AddCommand(aasMenuItem);
+
+                var angularDirectiveCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularDirective);
+                var aadMenuItem = new MenuCommand(AddAngularDirectiveCallback, angularDirectiveCommandID);
+                commandService.AddCommand(aadMenuItem);
             }
         }
 
@@ -117,7 +133,70 @@ namespace Quickening
 
         }
 
-        private void SubItemCallback(object sender, EventArgs e)
+        private void AddAngularModuleCallback(object sender, EventArgs e)
+        {
+            IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(
+                typeof(SVsUIShell));
+            Guid clsid = Guid.Empty;
+            int result;
+            uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "TestCommand",
+                string.Format(CultureInfo.CurrentCulture,
+                "Inside TestCommand.SubItemCallback()",
+                this.ToString()),
+                string.Empty,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
+                OLEMSGICON.OLEMSGICON_INFO,
+                0,
+                out result);
+        }
+        private void AddAngularControllerCallback(object sender, EventArgs e)
+        {
+            IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(
+                typeof(SVsUIShell));
+            Guid clsid = Guid.Empty;
+            int result;
+            uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "TestCommand",
+                string.Format(CultureInfo.CurrentCulture,
+                "Inside TestCommand.SubItemCallback()",
+                this.ToString()),
+                string.Empty,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
+                OLEMSGICON.OLEMSGICON_INFO,
+                0,
+                out result);
+        }
+        private void AddAngularServiceCallback(object sender, EventArgs e)
+        {
+            IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(
+                typeof(SVsUIShell));
+            Guid clsid = Guid.Empty;
+            int result;
+            uiShell.ShowMessageBox(
+                0,
+                ref clsid,
+                "TestCommand",
+                string.Format(CultureInfo.CurrentCulture,
+                "Inside TestCommand.SubItemCallback()",
+                this.ToString()),
+                string.Empty,
+                0,
+                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
+                OLEMSGICON.OLEMSGICON_INFO,
+                0,
+                out result);
+        }
+        private void AddAngularDirectiveCallback(object sender, EventArgs e)
         {
             IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(
                 typeof(SVsUIShell));

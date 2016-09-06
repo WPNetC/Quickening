@@ -82,7 +82,7 @@ namespace Quickening.Services
                     {
                         // Both these methods create the directory, so we only want to use 1.
                         if (projectItem.Value.Include)
-                            IDEService.TraverseProjectItem(project, relPath, absPath);
+                            IDEService.AddItemToProject(project, relPath, absPath);
                         else
                             Directory.CreateDirectory(absPath);
                     }
@@ -100,7 +100,7 @@ namespace Quickening.Services
                             // Create relative path for parent directory.
                             var parPath = projectItem.Key.StartsWith(dir) ? projectItem.Key.Replace(dir, "") : projectItem.Key;
                             // Add to solution. This also creates the item.
-                            IDEService.TraverseProjectItem(project, parPath, absPath);
+                            IDEService.AddItemToProject(project, parPath, absPath);
                         }
                         else
                             Directory.CreateDirectory(dir);
@@ -120,7 +120,7 @@ namespace Quickening.Services
                             
                             // Add to project if requested.
                             if (projectItem.Value.Include)
-                                IDEService.TraverseProjectItem(project, relPath, absPath);
+                                IDEService.AddItemToProject(project, relPath, absPath);
                             
                             // Write template content to file.
                             File.WriteAllText(absPath, text);
@@ -140,7 +140,7 @@ namespace Quickening.Services
 
                     // Add to project if requested.
                     if (projectItem.Value.Include)
-                        IDEService.TraverseProjectItem(project, relPath, absPath);
+                        IDEService.AddItemToProject(project, relPath, absPath);
                 }
             }
         }

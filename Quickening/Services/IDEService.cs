@@ -44,66 +44,7 @@ namespace Quickening.Services
             }
         }
 
-        /*
-        private static void AddFolderOrFile(Project project, string path)
-        {
-            try
-            {
-                // Adding a folder.
-                if (string.IsNullOrEmpty(Path.GetExtension(path)))
-                {
-                    foreach (ProjectItem item in project.ProjectItems)
-                    {
-                        if (item.Kind == IDE_FOLDER_GUID)
-                        {
-                            var x = item.FileNames[0];
-                        }
-                    }
-                    // Adds a new folder to the solution.
-                    project.ProjectItems.AddFolder(path);
-                    return;
-                }
-                // Adding a file.
-                else
-                {
-                    // Check if containing folder exists in project.
-                    ProjectItem folder = null;
-                    foreach (ProjectItem item in project.ProjectItems)
-                    {
-                        if (item.Name.ToLower() == Path.GetDirectoryName(path).ToLower())
-                        {
-                            folder = item;
-                            break;
-                        }
-                    }
-
-                    // If not, create it.
-                    if (folder == null)
-                    {
-                        folder = project.ProjectItems.AddFolder(path);
-                    }
-
-                    // Check if file already exists in project.
-                    ProjectItem file = null;
-                    foreach (ProjectItem item in folder.ProjectItems)
-                    {
-                        //TraverseProjectItem(item);
-                    }
-
-                    // If not, create it.
-                    if (file == null)
-                        folder.ProjectItems.AddFromFile(path);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                System.Windows.Forms.MessageBox.Show(ex.Message);
-            }
-        }
-        */
-
-        internal static void TraverseProjectItem(Project project, string relPath, string absPath)
+        internal static void AddItemToProject(Project project, string relPath, string absPath)
         {
             /*
              * We need to ensure any parent directories already exist before creating the new project item.
@@ -114,7 +55,8 @@ namespace Quickening.Services
             // Get if we are adding a file.
             bool isFile = !string.IsNullOrEmpty(Path.GetExtension(relPath));
 
-            // Split path into directories and the file if it exists.
+            // Split relative path into directories and the file if it exists.
+            // We need the relative path here as that is how the project manages its' items.
             var dirs = relPath.Split('\\');
 
             // Get top level project items.
@@ -147,7 +89,7 @@ namespace Quickening.Services
                     catch (Exception ex)
                     {
                         System.Windows.Forms.MessageBox.Show(ex.Message, "Error");
-                        throw ex;
+                        return;
                     }
                 }
 
@@ -160,14 +102,17 @@ namespace Quickening.Services
             {
                 try
                 {
+                    // Create the file if needed and add it to the project.
                     if (!File.Exists(absPath))
                         File.Create(absPath).Dispose();
 
+                    // Here we need the absolute path, unlike when adding a folder, because reasons.
                     levelItems.AddFromFile(absPath);
                 }
                 catch (Exception ex)
                 {
-                    //System.Windows.Forms.MessageBox.Show(ex.Message, "Error");
+                    System.Windows.Forms.MessageBox.Show(ex.Message, "Error");
+                    return;
                 }
             }
         }

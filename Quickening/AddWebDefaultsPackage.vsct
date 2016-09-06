@@ -15,8 +15,8 @@
         <Parent guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenu"/>
       </Group>
       <!--Sub menu group-->
-      <Group guid="guidAddWebDefaultsPackageCmdSet" id="SubMenuGroup" priority="0x0000">
-        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="SubMenu"/>
+      <Group guid="guidAddWebDefaultsPackageCmdSet" id="AngularSubMenuGroup" priority="0x0000">
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="AngularSubMenu"/>
       </Group>
     </Groups>
 
@@ -25,39 +25,63 @@
       <Menu guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenu" priority="0x200" type="Menu">
         <Parent guid="guidAddWebDefaultsPackageCmdSet" id="ProjNodeGroup" />
         <Strings>
-          <ButtonText>TestMenu</ButtonText>
-          <CommandName>TestMenu</CommandName>
+          <ButtonText>Quick Blocks</ButtonText>
+          <CommandName>Quick Blocks</CommandName>
         </Strings>
       </Menu>
       <!--Sub menu with parent set to top level menu-->
-      <Menu guid="guidAddWebDefaultsPackageCmdSet" id="SubMenu" priority="0x0100" type="Menu">
+      <Menu guid="guidAddWebDefaultsPackageCmdSet" id="AngularSubMenu" priority="0x0100" type="Menu">
         <Parent guid="guidAddWebDefaultsPackageCmdSet" id="TopLevelMenuGroup"/>
         <Strings>
-          <ButtonText>Sub Menu</ButtonText>
-          <CommandName>Sub Menu</CommandName>
+          <ButtonText>Angular</ButtonText>
+          <CommandName>Angular</CommandName>
         </Strings>
       </Menu>
     </Menus>
 
     <Buttons>
-      <!--Button directly in project context menu group-->
+      <!--Button directly in project context menu group. No image set on this.-->
       <Button guid="guidAddWebDefaultsPackageCmdSet" id="cmdidAddWebDefaults" priority="0x0100" type="Button">
         <Parent guid="guidAddWebDefaultsPackageCmdSet" id="ProjNodeGroup" />
-        <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>Add Base Web Structure</ButtonText>
-          <CommandName>TestMenu</CommandName>
+          <CommandName>cmdidAddWebDefaults</CommandName>
         </Strings>
       </Button>
-      <!--Button in sub menu-->
-      <Button guid="guidAddWebDefaultsPackageCmdSet" id="cmdidTestSubCommand" priority="0x0000" type="Button">
-        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="SubMenuGroup" />
+      <!--Angular sub menu-->
+      <Button guid="guidAddWebDefaultsPackageCmdSet" id="cmdidAddAngularModule" priority="0x0000" type="Button">
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="AngularSubMenuGroup" />
         <Icon guid="guidImages" id="bmpPic2" />
         <Strings>
-          <CommandName>cmdidTestSubCommand</CommandName>
-          <ButtonText>Test Sub Command</ButtonText>
+          <ButtonText>Add Module</ButtonText>
+          <CommandName>cmdidAddAngularModule</CommandName>
         </Strings>
       </Button>
+      <Button guid="guidAddWebDefaultsPackageCmdSet" id="cmdidAddAngularController" priority="0x0100" type="Button">
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="AngularSubMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic2" />
+        <Strings>
+          <ButtonText>Add Controller</ButtonText>
+          <CommandName>cmdidAddAngularController</CommandName>
+        </Strings>
+      </Button>
+      <Button guid="guidAddWebDefaultsPackageCmdSet" id="cmdidAddAngularDirective" priority="0x0200" type="Button">
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="AngularSubMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic2" />
+        <Strings>
+          <ButtonText>Add Directive</ButtonText>
+          <CommandName>cmdidAddAngularDirective</CommandName>
+        </Strings>
+      </Button>
+      <Button guid="guidAddWebDefaultsPackageCmdSet" id="cmdidAddAngularService" priority="0x0300" type="Button">
+        <Parent guid="guidAddWebDefaultsPackageCmdSet" id="AngularSubMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic2" />
+        <Strings>
+          <ButtonText>Add Service</ButtonText>
+          <CommandName>cmdidAddAngularService</CommandName>
+        </Strings>
+      </Button>
+      <!--End angular sub menu-->
     </Buttons>
 
     <Bitmaps>
@@ -72,11 +96,14 @@
     <GuidSymbol name="guidAddWebDefaultsPackageCmdSet" value="{dd7b9b46-7e8c-48a4-992f-905556b5ad36}">
       <IDSymbol value="0x1022" name="ProjNodeGroup" />
       <IDSymbol value="0x1020" name="TopLevelMenuGroup" />
-      <IDSymbol value="0x1150" name="SubMenuGroup" />
+      <IDSymbol value="0x1150" name="AngularSubMenuGroup" />
       <IDSymbol value="0x1021" name="TopLevelMenu" />
-      <IDSymbol value="0x1100" name="SubMenu" />
+      <IDSymbol value="0x1100" name="AngularSubMenu" />
       <IDSymbol value="0x0100" name="cmdidAddWebDefaults" />
-      <IDSymbol value="0x0105" name="cmdidTestSubCommand" />
+      <IDSymbol value="0x0105" name="cmdidAddAngularModule" />
+      <IDSymbol value="0x0106" name="cmdidAddAngularController" />
+      <IDSymbol value="0x0107" name="cmdidAddAngularDirective" />
+      <IDSymbol value="0x0108" name="cmdidAddAngularService" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{63af8615-aeb4-4d11-8feb-672952411df6}" >
