@@ -1,0 +1,4 @@
+﻿(function(){
+	var vm = this;
+	var that = vm;
+})();

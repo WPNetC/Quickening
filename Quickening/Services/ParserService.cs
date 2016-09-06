@@ -86,52 +86,61 @@ namespace Quickening.Services
                         else
                             Directory.CreateDirectory(absPath);
                     }
+                    continue;
                 }
-                else
-                {
-                    if (!File.Exists(absPath))
-                    {
-                        // Check parent directory exists before creating file.
-                        var dir = Path.GetDirectoryName(absPath);
-                        if (!Directory.Exists(dir))
-                        {
-                            if (projectItem.Value.Include)
-                            {
-                                // Create relative path for parent directory.
-                                var parPath = projectItem.Key.StartsWith(dir) ? projectItem.Key.Replace(dir, "") : projectItem.Key;
-                                // Add to solution. This also creates the item.
-                                IDEService.TraverseProjectItem(project, parPath, absPath);
-                            }
-                            else
-                                Directory.CreateDirectory(dir);
-                        }
-                        
-                        // If there is a template id.
-                        if (!string.IsNullOrEmpty(projectItem.Value.TemplateId))
-                        {
-                            var templatePath = Path.Combine(ProjectService.TemplatesDirectory, projectItem.Value + ".txt");
-                            if (File.Exists(templatePath))
-                            {
-                                string text = File.ReadAllText(templatePath);
 
-                                if (projectItem.Value.Include)
-                                    IDEService.TraverseProjectItem(project, relPath, absPath);
-                                else
-                                    File.WriteAllText(absPath, text);
-                            }
-                            else
-                            {
-                                Console.WriteLine("Cannot find template file: " + templatePath);
-                            }
+                if (!File.Exists(absPath))
+                {
+                    // Check parent directory exists before creating file.
+                    var dir = Path.GetDirectoryName(absPath);
+                    if (!Directory.Exists(dir))
+                    {
+                        if (projectItem.Value.Include)
+                        {
+                            // Create relative path for parent directory.
+                            var parPath = projectItem.Key.StartsWith(dir) ? projectItem.Key.Replace(dir, "") : projectItem.Key;
+                            // Add to solution. This also creates the item.
+                            IDEService.TraverseProjectItem(project, parPath, absPath);
                         }
                         else
+                            Directory.CreateDirectory(dir);
+                    }
+
+                    // If there is a template id.
+                    if (!string.IsNullOrEmpty(projectItem.Value.TemplateId))
+                    {
+                        // Create path to template.
+                        var templatePath = Path.Combine(ProjectService.TemplatesDirectory, projectItem.Value.TemplateId + ".txt");
+
+                        // Check template exists.
+                        if (File.Exists(templatePath))
                         {
+                            // Create file from template.
+                            string text = File.ReadAllText(templatePath);
+                            
+                            // Add to project if requested.
                             if (projectItem.Value.Include)
                                 IDEService.TraverseProjectItem(project, relPath, absPath);
-                            else
-                                File.Create(absPath).Dispose();
+                            
+                            // Write template content to file.
+                            File.WriteAllText(absPath, text);
+
+
+                            continue;
+                        }
+                        // If not we have an error, but don't need to throw an exception.
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Cannot find template file: " + templatePath + "\r\n Empty file will be created instead.", "Error");
                         }
                     }
+
+                    // Create empty file.
+                    File.Create(absPath).Dispose();
+
+                    // Add to project if requested.
+                    if (projectItem.Value.Include)
+                        IDEService.TraverseProjectItem(project, relPath, absPath);
                 }
             }
         }

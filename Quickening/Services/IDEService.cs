@@ -160,7 +160,7 @@ namespace Quickening.Services
             {
                 try
                 {
-                    if(!File.Exists(absPath))
+                    if (!File.Exists(absPath))
                         File.Create(absPath).Dispose();
 
                     levelItems.AddFromFile(absPath);
