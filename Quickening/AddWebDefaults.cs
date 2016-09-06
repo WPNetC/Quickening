@@ -38,7 +38,12 @@ namespace Quickening
         /// VS Package that provides this command, not null.
         /// </summary>
         private readonly Package package;
+
         private CommandID webDefaultsCommandID;
+        private CommandID angularModuleCommandID;
+        private CommandID angularControllerCommandID;
+        private CommandID angularServiceCommandID;
+        private CommandID angularDirectiveCommandID;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AddWebDefaults"/> class.
@@ -57,23 +62,23 @@ namespace Quickening
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                var webDefaultsCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddWebDefaults);
+                webDefaultsCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddWebDefaults);
                 var awdMenuItem = new MenuCommand(AddWebDefaultsCallback, webDefaultsCommandID);
                 commandService.AddCommand(awdMenuItem);
 
-                var angularModuleCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularModule);
+                angularModuleCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularModule);
                 var aamMenuItem = new MenuCommand(AddAngularModuleCallback, angularModuleCommandID);
                 commandService.AddCommand(aamMenuItem);
 
-                var angularControllerCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularController);
+                angularControllerCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularController);
                 var aacMenuItem = new MenuCommand(AddAngularControllerCallback, angularControllerCommandID);
                 commandService.AddCommand(aacMenuItem);
 
-                var angularServiceCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularService);
+                angularServiceCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularService);
                 var aasMenuItem = new MenuCommand(AddAngularServiceCallback, angularServiceCommandID);
                 commandService.AddCommand(aasMenuItem);
 
-                var angularDirectiveCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularDirective);
+                angularDirectiveCommandID = new CommandID(guidAddWebDefaultsPackageCmdSet, cmdidAddAngularDirective);
                 var aadMenuItem = new MenuCommand(AddAngularDirectiveCallback, angularDirectiveCommandID);
                 commandService.AddCommand(aadMenuItem);
             }
