@@ -44,7 +44,7 @@ namespace Quickening
 
             // As we want to be able to exclude entire folders, run up the node tree to check if a parent is excluded.
             var parent = node.ParentNode;
-            while (include && (parent != null && parent.Name != ProjectService.RootTag))
+            while (include && (parent != null && parent.Name != ProjectService.ROOT_TAG))
             {
                 bool includeParent = true; // Seperate bool to get parent nodes setting.
                 if (bool.TryParse(parent.Attributes?[ProjectService.Attributes[XmlAttributeName.Include]]?.Value, out includeParent))

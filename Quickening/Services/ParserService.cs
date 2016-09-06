@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnvDTE;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -65,42 +66,46 @@ namespace Quickening.Services
         /// </summary>
         /// <param name="projectDirectory"></param>
         /// <param name="projectItems"></param>
-        public void WriteStructure(EnvDTE.Project project, string projectDirectory, Dictionary<string, AttributeSet> projectItems)
+        public void WriteStructure(Project project, string projectDirectory, Dictionary<string, AttributeSet> projectItems)
         {
             // Itterate through unique paths and create files and folders.
             foreach (var projectItem in projectItems)
             {
-                // Create absolute path.
+                // Create absolute and relative paths.
                 var absPath = !projectItem.Key.StartsWith(projectDirectory) ? Path.Combine(projectDirectory, projectItem.Key) : projectItem.Key;
+                var relPath = projectItem.Key.StartsWith(projectDirectory) ? projectItem.Key.Replace(projectDirectory, "") : projectItem.Key;
 
                 // If no extension it must be a directory.
                 if (string.IsNullOrEmpty(Path.GetExtension(absPath)))
                 {
                     if (!Directory.Exists(absPath))
                     {
-                        Console.WriteLine("Creating directory: " + absPath);
-                        Directory.CreateDirectory(absPath);
-
+                        // Both these methods create the directory, so we only want to use 1.
                         if (projectItem.Value.Include)
-                            IDEService.AddFolderAndFiles(project, absPath);
+                            IDEService.TraverseProjectItem(project, relPath, absPath);
+                        else
+                            Directory.CreateDirectory(absPath);
                     }
                 }
                 else
                 {
                     if (!File.Exists(absPath))
                     {
-                        // Check directory exists before creating file.
+                        // Check parent directory exists before creating file.
                         var dir = Path.GetDirectoryName(absPath);
                         if (!Directory.Exists(dir))
                         {
-                            Directory.CreateDirectory(dir);
-
                             if (projectItem.Value.Include)
-                                IDEService.AddFolderAndFiles(project, dir);
+                            {
+                                // Create relative path for parent directory.
+                                var parPath = projectItem.Key.StartsWith(dir) ? projectItem.Key.Replace(dir, "") : projectItem.Key;
+                                // Add to solution. This also creates the item.
+                                IDEService.TraverseProjectItem(project, parPath, absPath);
+                            }
+                            else
+                                Directory.CreateDirectory(dir);
                         }
-
-                        Console.WriteLine("Creating file: " + absPath);
-
+                        
                         // If there is a template id.
                         if (!string.IsNullOrEmpty(projectItem.Value.TemplateId))
                         {
@@ -108,12 +113,11 @@ namespace Quickening.Services
                             if (File.Exists(templatePath))
                             {
                                 string text = File.ReadAllText(templatePath);
-                                File.WriteAllText(absPath, text);
 
                                 if (projectItem.Value.Include)
-                                    IDEService.AddFolderAndFiles(project, absPath);
-
-                                Console.WriteLine("contents: " + text);
+                                    IDEService.TraverseProjectItem(project, relPath, absPath);
+                                else
+                                    File.WriteAllText(absPath, text);
                             }
                             else
                             {
@@ -122,18 +126,14 @@ namespace Quickening.Services
                         }
                         else
                         {
-                            // Otherwise create an empty file.
-                            File.Create(absPath).Dispose();
-
                             if (projectItem.Value.Include)
-                                IDEService.AddFolderAndFiles(project, absPath);
+                                IDEService.TraverseProjectItem(project, relPath, absPath);
+                            else
+                                File.Create(absPath).Dispose();
                         }
                     }
                 }
             }
-
-            Console.WriteLine();
-            Console.WriteLine("Total files and directories: " + projectItems.Count);
         }
 
         private void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
@@ -146,7 +146,7 @@ namespace Quickening.Services
             while (parent != null
                 && parent.Name.ToLower() != "__root__")
             {
-                // Don't use our own tags on paths
+                // Don't use our own tags in paths
                 if (!ProjectService.ReservedTagsXml.Contains(parent.Name))
                     rel = Path.Combine(parent.Name, rel);
                 parent = parent.ParentNode;

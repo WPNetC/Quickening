@@ -103,7 +103,7 @@ namespace Quickening
             {
                 message = Directory.Exists(ProjectService.TemplatesDirectory) ? ProjectService.TemplatesDirectory : "Error";
                 var ps = new ParserService();
-                var list = ps.PaseXML(Path.Combine(ProjectService.XmlDirectory, "web-basic.xml"), false);
+                var list = ps.PaseXML(Path.Combine(ProjectService.XmlDirectory, "web-basic.xml"), true);
 
                 // Show a message box to prove we were here
                 var result = VsShellUtilities.ShowMessageBox(
