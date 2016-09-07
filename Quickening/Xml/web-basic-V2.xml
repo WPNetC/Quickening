@@ -1,17 +1,17 @@
-﻿<__root__ version="1">
+﻿<__root__ version="2">
   <sitefiles>
     <styles include="false">
       <sass>
         <modules>
           <__files__>
-            <__file__ template-id="">_general.scss</__file__>
+            <_general.scss template-id=""/>
           </__files__>
         </modules>
         <vendor></vendor>
         <__files__>
-          <__file__ template-id="">main.scss</__file__>
-          <__file__ template-id="">_variables.scss</__file__>
-          <__file__ template-id="">_mixin.scss</__file__>
+          <main.scss template-id=""/>
+          <_variables.scss template-id=""/>
+          <_mixin.scss template-id=""/>
         </__files__>
       </sass>
     </styles>
@@ -19,27 +19,27 @@
       <modules></modules>
       <vendor></vendor>
       <__files__>
-        <__file__ template-id="abcdef">main.js</__file__>
-        <__file__ template-id="defg">constants.js</__file__>
+        <main.js template-id="abcdef"/>
+        <constants.js template-id="defg"/>
       </__files__>
     </scripts>
     <ng>
       <modules>
         <__files__>
-          <__file__ template-id="">ngMain.js</__file__>
+          <ngMain.js template-id=""/>
         </__files__>
       </modules>
       <controllers>
         <__files__>
-          <__file__ template-id="">mainController.js</__file__>
+          <mainController.js template-id=""/>
         </__files__>
       </controllers>
       <services></services>
       <directives></directives>
     </ng>
     <__files__>
-      <__file__ template-id="">gulpfile.js</__file__>
-      <__file__ template-id="">packages.json</__file__>
+      <gulpfile.js template-id=""/>
+      <packages.json template-id=""/>
     </__files__>
   </sitefiles>
 </__root__>

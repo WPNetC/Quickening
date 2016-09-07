@@ -23,6 +23,7 @@ namespace Quickening
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(AddWebDefaultsPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
+    [ProvideToolWindow(typeof(Configurator))]
     public sealed class AddWebDefaultsPackage : Package
     {
         public const string PackageGuidString = "d956dd77-3584-404d-adba-254e551e99bc";
@@ -45,6 +46,7 @@ namespace Quickening
         {
             AddWebDefaults.Initialize(this);
             base.Initialize();
+            ConfiguratorCommand.Initialize(this);
         }
 
         #endregion

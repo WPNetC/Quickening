@@ -10,6 +10,11 @@ namespace Quickening
     public struct AttributeSet
     {
         /// <summary>
+        /// The name of the XML node.
+        /// </summary>
+        public string NodeName { get; private set; }
+
+        /// <summary>
         /// Id of the template to use when creating a file.
         /// <pare>Default to empty string.</pare>
         /// </summary>
@@ -21,8 +26,9 @@ namespace Quickening
         /// </summary>
         public bool Include { get; private set; }
         
-        private AttributeSet(string id, bool include)
+        private AttributeSet(string name, string id, bool include)
         {
+            NodeName = name;
             TemplateId = id;
             Include = include;
         }
@@ -34,7 +40,7 @@ namespace Quickening
         /// <returns></returns>
         public static AttributeSet FromXmlNode(XmlNode node)
         {
-            // Look for 'template id' attribute, default to empty.
+            // Look for 'template-id' attribute, default to empty.
             string id = node.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value ?? "";
 
             // Look for 'include' attribute, default to true.
@@ -53,7 +59,7 @@ namespace Quickening
                 parent = parent.ParentNode; // Step up XML tree.
             }
 
-            return new AttributeSet(id, include);
+            return new AttributeSet(node.Name, id, include);
         }
     }
 }

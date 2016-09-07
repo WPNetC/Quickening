@@ -9,7 +9,7 @@ namespace Quickening.Services
 {
     internal class ParserService
     {
-        #region XML Method
+        #region XML Methods
 
         /// <summary>
         /// Parse Xml file into dictionary of relative paths and template ids.
@@ -45,7 +45,7 @@ namespace Quickening.Services
             // Itterate through XML and populate list.
             foreach (XmlNode node in root.ChildNodes)
             {
-                var nodeDir = node.Name;
+                var nodeDir = node.Attributes["name"].Value;
                 paths.Add(nodeDir, AttributeSet.FromXmlNode(node));
 
                 var children = node.ChildNodes;
@@ -148,16 +148,16 @@ namespace Quickening.Services
         private void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
         {
             // Don't use our own tags on paths
-            var rel = ProjectService.ReservedTagsXml.Contains(node.Name) ? "" : node.Name;
+            var rel = ProjectService.ReservedTagsXml.Contains(node.Attributes["name"].Value) ? "" : node.Attributes["name"].Value;
 
             // Go back up tree until we hit root node.
             var parent = node.ParentNode;
             while (parent != null
-                && parent.Name.ToLower() != "__root__")
+                && parent.Attributes["name"].Value.ToLower() != "root")
             {
                 // Don't use our own tags in paths
-                if (!ProjectService.ReservedTagsXml.Contains(parent.Name))
-                    rel = Path.Combine(parent.Name, rel);
+                if (!ProjectService.ReservedTagsXml.Contains(parent.Attributes["name"].Value))
+                    rel = Path.Combine(parent.Attributes["name"].Value, rel);
                 parent = parent.ParentNode;
             }
 
@@ -165,13 +165,18 @@ namespace Quickening.Services
             if (node.HasChildNodes)
             {
                 // If we are in the 'files' node.
-                if (node.Name.ToLower() == "__files__")
+                if (node.Attributes["name"].Value.ToLower() == "__files__")
                 {
                     // Itterate through each file node.
                     foreach (XmlNode fileNode in node.ChildNodes)
                     {
-                        // Generate relative path from inner text of file node.
-                        var filePath = Path.Combine(rel, fileNode.InnerText);
+                        // Generate relative path.
+                        //var filePath = fileNode.OwnerDocument.FirstChild.Attributes["version"].Value == "2" ?
+                        //    Path.Combine(rel, fileNode.Attributes["name"].Value) :
+                        //    Path.Combine(rel, fileNode.InnerText);
+
+                        var filePath = Path.Combine(rel, fileNode.Attributes["name"].Value);
+
                         var fileAttrs = AttributeSet.FromXmlNode(fileNode);
                         if (!paths.Keys.Contains(filePath))
                             paths.Add(filePath, fileAttrs);
