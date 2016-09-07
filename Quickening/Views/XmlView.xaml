@@ -137,14 +137,18 @@
             <TextBlock DockPanel.Dock="Top"
                        Style="{StaticResource SubHeader}"
                        Text="Item Details" />
-            <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
+            <Border DockPanel.Dock="Top"
+                    IsEnabled="{Binding CanSetType}"
+                    Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel Style="{StaticResource editPanelTextRowStyle}">
                     <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Type: " />
                     <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}" SelectedValue="{Binding ItemType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
             </Border>
             <!--  Item name  -->
-            <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
+            <Border DockPanel.Dock="Top"
+                    IsEnabled="{Binding CanSetName}"
+                    Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel Style="{StaticResource editPanelTextRowStyle}">
                     <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Name: " />
                     <TextBox HorizontalAlignment="Stretch"
@@ -156,7 +160,9 @@
                 </StackPanel>
             </Border>
             <!--  Include in project  -->
-            <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
+            <Border DockPanel.Dock="Top"
+                    IsEnabled="{Binding CanSetInclude}"
+                    Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel Orientation="Horizontal" Style="{StaticResource editPanelTextRowStyle}">
                     <TextBlock Style="{StaticResource LabelTextStyle}" Text="Include in project: " />
                     <CheckBox Margin="4,0"
@@ -168,15 +174,20 @@
                 </StackPanel>
             </Border>
             <!--  Template Linking  -->
-            <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
+            <Border DockPanel.Dock="Top"
+                    IsEnabled="{Binding CanUseTemplate}"
+                    Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel>
                     <StackPanel Style="{StaticResource editPanelTextRowStyle}">
                         <TextBlock Style="{StaticResource LabelTextStyle}" Text="Template: " />
-                        <ComboBox SelectedValue="{Binding Template, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ComboBoxItem Content="Folder" />
-                            <ComboBoxItem Content="File" />
+                        <ComboBox ItemsSource="{Binding Path=Templates}" SelectedValue="{Binding Path=Template, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <!--<TextBlock Style="{StaticResource LabelTextStyle}" Text="{Binding Path=SelectedNode.Attributes[template-id].Value}" />-->
+
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center" Style="{StaticResource editPanelButtonRowStyle}">
                         <Button Width="50"
@@ -190,7 +201,8 @@
             </Border>
             <Button Margin="5,0"
                     Content="Save"
-                    DockPanel.Dock="Top" />
+                    DockPanel.Dock="Top"
+                    IsEnabled="{Binding CanSave}" />
         </DockPanel>
     </Grid>
 </UserControl>

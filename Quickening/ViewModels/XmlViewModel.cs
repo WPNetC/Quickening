@@ -21,6 +21,11 @@ namespace Quickening.ViewModels
         private string _itemName;
         private bool _includeInProject;
         private string _templateId;
+        private ObservableCollection<string> _templates;
+        private bool _canSetType;
+        private bool _canSetName;
+        private bool _canSave;
+        private bool _canSetInclude;
 
         public XmlViewModel()
         {
@@ -44,7 +49,7 @@ namespace Quickening.ViewModels
             }
             private set
             {
-                if(value != _xmlData)
+                if (value != _xmlData)
                 {
                     _xmlData = value;
                     OnChanged();
@@ -56,7 +61,7 @@ namespace Quickening.ViewModels
             get
             {
 #if DEBUG
-                if(_selectedNode == null)
+                if (_selectedNode == null)
                 {
                     _selectedNode = XmlData?.Document?.FirstChild;
                 }
@@ -65,7 +70,7 @@ namespace Quickening.ViewModels
             }
             set
             {
-                if(value != _selectedNode)
+                if (value != _selectedNode)
                 {
                     _selectedNode = value;
 
@@ -75,7 +80,72 @@ namespace Quickening.ViewModels
                 }
             }
         }
+        public ObservableCollection<string> Templates
+        {
+            get
+            {
+                if (_templates == null)
+                {
+                    var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
+                    _templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
+                }
+                return _templates;
+            }
+            private set
+            {
+                if (value != _templates)
+                {
+                    _templates = value;
+                    OnChanged();
+                }
+            }
+        }
 
+        public bool CanSetType
+        {
+            get
+            {
+                return _canSetType;
+            }
+            private set
+            {
+                if (value != _canSetType)
+                {
+                    _canSetType = value;
+                    OnChanged();
+                }
+            }
+        }
+        public bool CanSetName
+        {
+            get
+            {
+                return _canSetName;
+            }
+            private set
+            {
+                if (value != _canSetName)
+                {
+                    _canSetName = value;
+                    OnChanged();
+                }
+            }
+        }
+        public bool CanSetInclude
+        {
+            get
+            {
+                return _canSetInclude;
+            }
+            private set
+            {
+                if (value != _canSetInclude)
+                {
+                    _canSetInclude = value;
+                    OnChanged();
+                }
+            }
+        }
         public bool CanUseTemplate
         {
             get
@@ -84,9 +154,24 @@ namespace Quickening.ViewModels
             }
             private set
             {
-                if(value != _canUseTemplate)
+                if (value != _canUseTemplate)
                 {
                     _canUseTemplate = value;
+                    OnChanged();
+                }
+            }
+        }
+        public bool CanSave
+        {
+            get
+            {
+                return _canSave;
+            }
+            private set
+            {
+                if (value != _canSave)
+                {
+                    _canSave = value;
                     OnChanged();
                 }
             }
@@ -100,7 +185,7 @@ namespace Quickening.ViewModels
             }
             set
             {
-                if(value != _itemType)
+                if (value != _itemType)
                 {
                     _itemType = value;
                     OnChanged();
@@ -115,7 +200,7 @@ namespace Quickening.ViewModels
             }
             set
             {
-                if(value != _itemName)
+                if (value != _itemName)
                 {
                     _itemName = value;
                     OnChanged();
@@ -130,7 +215,7 @@ namespace Quickening.ViewModels
             }
             set
             {
-                if(value != _includeInProject)
+                if (value != _includeInProject)
                 {
                     _includeInProject = value;
                     OnChanged();
@@ -145,7 +230,7 @@ namespace Quickening.ViewModels
             }
             set
             {
-                if(value != _templateId)
+                if (value != _templateId)
                 {
                     _templateId = value;
                     OnChanged();
@@ -159,6 +244,11 @@ namespace Quickening.ViewModels
             dp.Source = new Uri(@"C:\Projects\Quickening\Quickening\Xml\web-basic-V3.xml");
             dp.XPath = "/root";
             XmlData = dp;
+        }
+        internal void UpdateTemplateList()
+        {
+            var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
+            Templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
         }
         internal void NodeToProperties()
         {
