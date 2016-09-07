@@ -35,11 +35,11 @@
     </LinearGradientBrush>
     <!--    -->
 
-    <!-- Content Styles  -->
+    <!--  Content Styles  -->
     <Style x:Key="ShadowStyle">
         <Setter Property="Control.Foreground" Value="Black" />
     </Style>
-    
+
     <Style x:Key="ForeStyle">
         <Setter Property="Control.Foreground" Value="White" />
     </Style>
@@ -64,7 +64,7 @@
     </Style>
     <!--    -->
 
-    <!-- Border Styles -->
+    <!--  Border Styles  -->
     <Style x:Key="SilverBorder" TargetType="{x:Type Border}">
         <Setter Property="BorderThickness" Value="4" />
         <Setter Property="BorderBrush" Value="{StaticResource SilverGradient}" />
@@ -92,8 +92,8 @@
                 <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
                     <Grid>
                         <Border Background="{StaticResource Bkg_03}"
-                                    BorderBrush="{StaticResource Border_01}"
-                                    BorderThickness="0,1,0,1" />
+                                BorderBrush="{StaticResource Border_01}"
+                                BorderThickness="0,1,0,1" />
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Grid>
                 </ControlTemplate>
@@ -131,7 +131,7 @@
 
     <!--  TextBox Styles  -->
     <Style x:Key="DefaultTextBoxStyle" TargetType="TextBox">
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="MaxHeight" Value="32" />
     </Style>
     <!--    -->
@@ -139,9 +139,9 @@
     <!--  ComboBox\List Styles  -->
     <Style x:Key="DefaultComboBoxStyle" TargetType="{x:Type ComboBox}">
         <Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
-        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
     </Style>
 
     <Style x:Key="DefaultComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
@@ -161,7 +161,7 @@
     </Style>
 
     <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -175,9 +175,9 @@
                             Padding="4,2">
                         <Grid>
                             <ContentPresenter x:Name="content"
-                                              Style="{StaticResource ForeStyle}"
+                                              HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
-                                              HorizontalAlignment="Center"/>
+                                              Style="{StaticResource ForeStyle}" />
 
                         </Grid>
                     </Border>
@@ -217,7 +217,7 @@
         <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
-    
+
     <Style x:Key="MainMenuItemStyle" TargetType="MenuItem">
         <Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
         <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />

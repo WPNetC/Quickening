@@ -71,9 +71,20 @@ namespace Quickening.Services
             // Itterate through unique paths and create files and folders.
             foreach (var projectItem in projectItems)
             {
+                string absPath, relPath;
+                bool pathIsAbsolute = projectItem.Key.StartsWith(projectDirectory);
+
                 // Create absolute and relative paths.
-                var absPath = !projectItem.Key.StartsWith(projectDirectory) ? Path.Combine(projectDirectory, projectItem.Key) : projectItem.Key;
-                var relPath = projectItem.Key.StartsWith(projectDirectory) ? projectItem.Key.Replace(projectDirectory, "") : projectItem.Key;
+                if (pathIsAbsolute)
+                {
+                    absPath = projectItem.Key;
+                    relPath = projectItem.Key.Replace(projectDirectory, "");
+                }
+                else
+                {
+                    absPath = Path.Combine(projectDirectory, projectItem.Key);
+                    relPath = projectItem.Key;
+                }
 
                 // If no extension it must be a directory.
                 if (string.IsNullOrEmpty(Path.GetExtension(absPath)))
@@ -88,8 +99,8 @@ namespace Quickening.Services
                     }
                     continue;
                 }
-
-                if (!File.Exists(absPath))
+                // Otherwise it should be a file.
+                else if (!File.Exists(absPath))
                 {
                     // Check parent directory exists before creating file.
                     var dir = Path.GetDirectoryName(absPath);
@@ -125,13 +136,13 @@ namespace Quickening.Services
                             // Write template content to file.
                             File.WriteAllText(absPath, text);
 
-
                             continue;
                         }
                         // If not we have an error, but don't need to throw an exception.
                         else
                         {
-                            System.Windows.Forms.MessageBox.Show("Cannot find template file: " + templatePath + "\r\n Empty file will be created instead.", "Error");
+                            System.Windows.Forms.MessageBox.Show("Cannot find template file: "+ templatePath + " for file '"+relPath+"'."
+                                + "\r\n Empty file will be created instead.", "Error");
                         }
                     }
 

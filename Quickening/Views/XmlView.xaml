@@ -1,14 +1,14 @@
 ﻿<UserControl x:Class="Quickening.Views.XmlView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Quickening.Views"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:vm="clr-namespace:Quickening.ViewModels"
-             mc:Ignorable="d" 
              d:DesignHeight="300"
-             d:DesignWidth="500">
+             d:DesignWidth="500"
+             mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <vm:XmlViewModel x:Key="xvm" />
@@ -20,8 +20,8 @@
 
     <Grid x:Name="grdMain" DataContext="{StaticResource xvm}">
         <Grid.Resources>
-            <!--Node templates-->
-            <x:Array Type="{x:Type sys:Object}" x:Key="treeMenuItems">
+            <!--  Node templates  -->
+            <x:Array x:Key="treeMenuItems" Type="{x:Type sys:Object}">
                 <MenuItem Header="Add" />
                 <MenuItem Header="Delete" />
                 <Separator />
@@ -52,11 +52,13 @@
                             <MenuItem Header="Delete" />
                         </ContextMenu>
                     </DockPanel.ContextMenu>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <TextBlock Margin="0" Text="Folder:" />
                         <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Margin="5,0,0,0">
+                    <StackPanel Margin="5,0,0,0"
+                                DockPanel.Dock="Left"
+                                Orientation="Horizontal">
                         <TextBlock Margin="0" Text="Include:" />
                         <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@include, FallbackValue=true, TargetNullValue=true}" />
                     </StackPanel>
@@ -72,89 +74,108 @@
                             <MenuItem Header="Delete" />
                         </ContextMenu>
                     </DockPanel.ContextMenu>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <TextBlock Margin="0" Text="File:" />
                         <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Margin="5,0,0,0">
+                    <StackPanel Margin="5,0,0,0"
+                                DockPanel.Dock="Left"
+                                Orientation="Horizontal">
                         <TextBlock Margin="0" Text="Include:" />
                         <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@include, FallbackValue=true, TargetNullValue=true}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Margin="5,0,0,0">
+                    <StackPanel Margin="5,0,0,0"
+                                DockPanel.Dock="Left"
+                                Orientation="Horizontal">
                         <TextBlock Margin="0" Text="Template:" />
                         <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@template-id, FallbackValue=No, TargetNullValue=No}" />
                     </StackPanel>
                 </DockPanel>
             </HierarchicalDataTemplate>
-            <!--End Node templates-->
+            <!--  End Node templates  -->
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="200" />
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0" DataContext="{Binding XmlData}">
-            <TreeView Name="dirTree" ItemsSource="{Binding}"
-                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            <TreeView Name="dirTree"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      ItemsSource="{Binding}"
+                      SelectedItemChanged="dirTree_SelectedItemChanged"
                       VirtualizingStackPanel.IsVirtualizing="False"
-                      VirtualizingStackPanel.VirtualizationMode="Standard"
-                      SelectedItemChanged="dirTree_SelectedItemChanged"/>
+                      VirtualizingStackPanel.VirtualizationMode="Standard" />
         </Grid>
 
         <DockPanel Grid.Column="1">
             <DockPanel.Resources>
-                <Style TargetType="StackPanel" x:Key="editPanelTextRowStyle">
-                    <Setter Property="Orientation" Value="Horizontal"/>
-                    <Setter Property="Margin" Value="0,0,0,4"/>
+                <Style x:Key="editPanelTextRowStyle" TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                    <Setter Property="Margin" Value="0,0,0,4" />
                 </Style>
-                <Style TargetType="StackPanel" x:Key="editPanelButtonRowStyle">
-                    <Setter Property="Orientation" Value="Horizontal"/>
-                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Style x:Key="editPanelButtonRowStyle" TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                    <Setter Property="HorizontalAlignment" Value="Right" />
                 </Style>
-                <Style TargetType="Border" x:Key="editPanelBorderStyle" BasedOn="{StaticResource BorderStyleThin}">
-                    <Setter Property="Margin" Value="1,2"/>
-                    <Setter Property="Padding" Value="4,6"/>
+                <Style x:Key="editPanelBorderStyle"
+                       BasedOn="{StaticResource BorderStyleThin}"
+                       TargetType="Border">
+                    <Setter Property="Margin" Value="1,2" />
+                    <Setter Property="Padding" Value="4,6" />
                 </Style>
             </DockPanel.Resources>
-            <TextBlock DockPanel.Dock="Top" Text="Item Details" Style="{StaticResource SubHeader}"/>
+            <TextBlock DockPanel.Dock="Top"
+                       Style="{StaticResource SubHeader}"
+                       Text="Item Details" />
             <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel Style="{StaticResource editPanelTextRowStyle}">
-                    <TextBlock Text="Item Type: " Style="{StaticResource LabelTextStyle}"/>
-                    <TextBlock Text="{Binding SelectedNode.Name, Mode=OneWay}" Style="{StaticResource LabelTextStyle}" />
+                    <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Type: " />
+                    <TextBlock Style="{StaticResource LabelTextStyle}" Text="{Binding SelectedNode.Name, Mode=OneWay}" />
                 </StackPanel>
             </Border>
-            <!--Item name-->
+            <!--  Item name  -->
             <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
-                <StackPanel Style="{StaticResource editPanelTextRowStyle}" Orientation="Vertical">
-                    <TextBlock Text="Item Name: " Style="{StaticResource LabelTextStyle}"/>
-                    <TextBox Text="{Binding Path=SelectedNode.Attributes[name].Value, Mode=OneWay}"
-                                 Style="{StaticResource DefaultTextBoxStyle}"
-                                 HorizontalAlignment="Stretch"
-                                 HorizontalContentAlignment="Stretch" />
+                <StackPanel Orientation="Vertical" Style="{StaticResource editPanelTextRowStyle}">
+                    <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Name: " />
+                    <TextBox HorizontalAlignment="Stretch"
+                             HorizontalContentAlignment="Stretch"
+                             Style="{StaticResource DefaultTextBoxStyle}"
+                             Text="{Binding Path=SelectedNode.Attributes[name].Value,
+                                            Mode=OneWay}" />
                 </StackPanel>
             </Border>
-            <!--Include in project-->
+            <!--  Include in project  -->
             <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel Style="{StaticResource editPanelTextRowStyle}">
-                    <TextBlock Text="Include in project: " Style="{StaticResource LabelTextStyle}"/>
-                    <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="4,0"/>
+                    <TextBlock Style="{StaticResource LabelTextStyle}" Text="Include in project: " />
+                    <CheckBox Margin="4,0"
+                              VerticalAlignment="Center"
+                              VerticalContentAlignment="Center" />
                 </StackPanel>
             </Border>
-            <!--Template Linking-->
+            <!--  Template Linking  -->
             <Border DockPanel.Dock="Top" Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel>
                     <StackPanel Style="{StaticResource editPanelTextRowStyle}">
-                        <TextBlock Text="Template ID: " Style="{StaticResource LabelTextStyle}"/>
-                        <TextBlock Text="{Binding Path=SelectedNode.Attributes[template-id].Value}" Style="{StaticResource LabelTextStyle}"/>
+                        <TextBlock Style="{StaticResource LabelTextStyle}" Text="Template ID: " />
+                        <TextBlock Style="{StaticResource LabelTextStyle}" Text="{Binding Path=SelectedNode.Attributes[template-id].Value}" />
                     </StackPanel>
-                    <StackPanel Style="{StaticResource editPanelButtonRowStyle}" HorizontalAlignment="Center">
-                        <Button Margin="2,0" Width="50" Content="Select"/>
-                        <Button Margin="2,0" Width="50" Content="New"/>
-                        <Button Margin="2,0" Width="50" Content="Edit"/>
+                    <StackPanel HorizontalAlignment="Center" Style="{StaticResource editPanelButtonRowStyle}">
+                        <Button Width="50"
+                                Margin="2,0"
+                                Content="Select" />
+                        <Button Width="50"
+                                Margin="2,0"
+                                Content="New" />
+                        <Button Width="50"
+                                Margin="2,0"
+                                Content="Edit" />
                     </StackPanel>
                 </StackPanel>
             </Border>
-            <Button DockPanel.Dock="Top" Content="Save"/>
+            <Button Content="Save" DockPanel.Dock="Top" />
         </DockPanel>
     </Grid>
 </UserControl>
