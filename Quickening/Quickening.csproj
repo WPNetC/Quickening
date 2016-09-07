@@ -55,6 +55,7 @@
     <Compile Include="AddWebDefaultsPackage.cs" />
     <Compile Include="AttributeSet.cs" />
     <Compile Include="Globals\Colours.cs" />
+    <Compile Include="Globals\ProjectItemType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ProjectService.cs" />
     <Compile Include="Services\IDEService.cs" />

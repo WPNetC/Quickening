@@ -1,4 +1,5 @@
-﻿using Quickening.Services;
+﻿using Quickening.Globals;
+using Quickening.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +16,11 @@ namespace Quickening.ViewModels
     {
         private XmlNode _selectedNode;
         private XmlDataProvider _xmlData;
+        private bool _canUseTemplate;
+        private ProjectItemType _itemType;
+        private string _itemName;
+        private bool _includeInProject;
+        private string _templateId;
 
         public XmlViewModel()
         {
@@ -45,7 +51,6 @@ namespace Quickening.ViewModels
                 }
             }
         }
-
         public XmlNode SelectedNode
         {
             get
@@ -63,6 +68,86 @@ namespace Quickening.ViewModels
                 if(value != _selectedNode)
                 {
                     _selectedNode = value;
+
+                    NodeToProperties();
+
+                    OnChanged();
+                }
+            }
+        }
+
+        public bool CanUseTemplate
+        {
+            get
+            {
+                return _canUseTemplate;
+            }
+            private set
+            {
+                if(value != _canUseTemplate)
+                {
+                    _canUseTemplate = value;
+                    OnChanged();
+                }
+            }
+        }
+
+        public ProjectItemType ItemType
+        {
+            get
+            {
+                return _itemType;
+            }
+            set
+            {
+                if(value != _itemType)
+                {
+                    _itemType = value;
+                    OnChanged();
+                }
+            }
+        }
+        public string ItemName
+        {
+            get
+            {
+                return _itemName;
+            }
+            set
+            {
+                if(value != _itemName)
+                {
+                    _itemName = value;
+                    OnChanged();
+                }
+            }
+        }
+        public bool IncludeInProject
+        {
+            get
+            {
+                return _includeInProject;
+            }
+            set
+            {
+                if(value != _includeInProject)
+                {
+                    _includeInProject = value;
+                    OnChanged();
+                }
+            }
+        }
+        public string Template
+        {
+            get
+            {
+                return _templateId;
+            }
+            set
+            {
+                if(value != _templateId)
+                {
+                    _templateId = value;
                     OnChanged();
                 }
             }
@@ -74,6 +159,20 @@ namespace Quickening.ViewModels
             dp.Source = new Uri(@"C:\Projects\Quickening\Quickening\Xml\web-basic-V3.xml");
             dp.XPath = "/root";
             XmlData = dp;
+        }
+        internal void NodeToProperties()
+        {
+            ProjectItemType itemType;
+            Enum.TryParse(SelectedNode?.Name, true, out itemType);
+
+            bool include;
+            if (!Boolean.TryParse(SelectedNode?.Attributes["include"]?.Value, out include))
+                include = true;
+
+            ItemType = itemType;
+            ItemName = SelectedNode?.Attributes["name"]?.Value;
+            IncludeInProject = include;
+            Template = SelectedNode?.Attributes["template-id"]?.Value;
         }
     }
 }
