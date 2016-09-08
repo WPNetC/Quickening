@@ -207,21 +207,6 @@ namespace Quickening.ViewModels
                 }
             }
         }
-        public bool IncludeInProject
-        {
-            get
-            {
-                return _includeInProject;
-            }
-            set
-            {
-                if (value != _includeInProject)
-                {
-                    _includeInProject = value;
-                    OnChanged();
-                }
-            }
-        }
         public string Template
         {
             get
@@ -237,11 +222,32 @@ namespace Quickening.ViewModels
                 }
             }
         }
-
-        internal void LoadXml()
+        public bool IncludeInProject
         {
+            get
+            {
+                return _includeInProject;
+            }
+            set
+            {
+                if (value != _includeInProject)
+                {
+                    _includeInProject = value;
+                    OnChanged();
+                }
+            }
+        }
+
+        internal void LoadXml(string xmlFileName)
+        {
+            // Make sure we just have the file name to standardise the process.
+            // As this could potentially be null or empty we will use string.Replace instead of Path.GetFileName.
+            if (xmlFileName.StartsWith(ProjectService.XmlDirectory))
+                xmlFileName = xmlFileName.Replace(ProjectService.XmlDirectory, "");
+            
             XmlDataProvider dp = new XmlDataProvider();
-            dp.Source = new Uri(@"C:\Projects\Quickening\Quickening\Xml\web-basic-V3.xml");
+            var path = Path.Combine(ProjectService.XmlDirectory, xmlFileName ?? "web-basic-V3.xml");
+            dp.Source = new Uri(path);
             dp.XPath = "/root";
             XmlData = dp;
         }
