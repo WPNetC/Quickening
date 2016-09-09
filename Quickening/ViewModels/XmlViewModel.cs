@@ -40,7 +40,8 @@ namespace Quickening.ViewModels
                 if (_xmlData == null)
                 {
                     XmlDataProvider dp = new XmlDataProvider();
-                    dp.Source = new Uri(@"C:\Projects\Quickening\Quickening\Xml\web-basic-V3.xml");
+                    var path = Path.Combine(ProjectService.XmlDirectory, "web-basic-V3.xml");
+                    dp.Source = new Uri(path);
                     dp.XPath = "/root";
                     _xmlData = dp;
                 }
