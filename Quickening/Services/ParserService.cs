@@ -163,8 +163,8 @@ namespace Quickening.Services
 
             // Go back up tree until we hit root node.
             var parent = node.ParentNode;
-            while (parent != null
-                && parent.Attributes["name"].Value.ToLower() != "root")
+            while (parent != null &&
+                (parent.Name?.ToLower() != "root") && parent.Attributes["name"]?.Value?.ToLower() != "root")
             {
                 // Don't use our own tags in paths
                 if (!ProjectService.ReservedTagsXml.Contains(parent.Attributes["name"].Value))
