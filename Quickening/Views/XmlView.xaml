@@ -7,13 +7,15 @@
              xmlns:local="clr-namespace:Quickening.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:vm="clr-namespace:Quickening.ViewModels"
              d:DesignHeight="300"
              d:DesignWidth="500"
+             xmlns:vms="clr-namespace:Quickening.ViewModels"
              mc:Ignorable="d">
+    <UserControl.DataContext>
+        <vms:XmlViewModel />
+    </UserControl.DataContext>
     <UserControl.Resources>
         <ResourceDictionary>
-            <vm:XmlViewModel x:Key="xvm" />
             <cnv:ElementToBoolConverter x:Key="elemToBool" />
             <ObjectDataProvider x:Key="dataFromEnum"
                                 MethodName="GetValues"
@@ -28,7 +30,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="grdMain" DataContext="{StaticResource xvm}">
+    <Grid x:Name="grdMain">
         <Grid.Resources>
             <!--  Node templates  -->
             <x:Array x:Key="treeMenuItems" Type="{x:Type sys:Object}">

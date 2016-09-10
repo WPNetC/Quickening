@@ -4,6 +4,7 @@ using System.Windows.Input;
 
 namespace Quickening.ICommands
 {
+    #region Xml View Model Commands
     internal sealed class SaveNode : ICommand
     {
         public SaveNode(XmlViewModel vm)
@@ -79,35 +80,5 @@ namespace Quickening.ICommands
             _vm.EditTemplate();
         }
     }
-
-
-
-    /*
-    internal sealed class SaveNode : ICommand
-    {
-        public SaveNode(XmlViewModel vm)
-        {
-            this._vm = vm;
-        }
-
-        private XmlViewModel _vm;
-
-        bool ICommand.CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        event EventHandler ICommand.CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-
-        void ICommand.Execute(object parameter)
-        {
-            _vm.SaveNode();
-        }
-    }
-    */
-
+    #endregion
 }

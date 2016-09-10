@@ -21,16 +21,9 @@ namespace Quickening.ViewModels
         private ObservableCollection<string> _templates;
         private XmlNode _selectedNode;
         private AttributeSet _nodeAttributes;
-        private bool _canUseTemplate;
-        private bool _canSetType;
-        private bool _canSetName;
-        private bool _canSave;
-        private bool _canSetInclude;
-        private bool _canEditTemplate;
-        private ICommand _cmdSaveNode;
-        private ICommand _cmdCreateNewTemplate;
-        private ICommand _cmdEditTemplate;
+        private bool _canUseTemplate, _canSetType, _canSetName, _canSave, _canSetInclude, _canEditTemplate;
         private string _currentDataFile;
+        private ICommand _cmdSaveNode, _cmdCreateNewTemplate, _cmdEditTemplate;
         #endregion
 
         public XmlViewModel()
@@ -43,17 +36,23 @@ namespace Quickening.ViewModels
             get
             {
                 if (string.IsNullOrEmpty(_currentDataFile))
+                    // Return default file.
                     _currentDataFile = Path.Combine(Strings.XmlDirectory, "web-basic-V3.xml");
+
                 return _currentDataFile;
             }
             set
             {
                 if (value != _currentDataFile)
                 {
-                    // Ensure we have the full path to the Xml file.
-                    if (value != null && !value.StartsWith(Strings.XmlDirectory))
+                    // Ensure we have the full and correct path to the Xml file.
+                    if (value != null)
                     {
-                        _currentDataFile = Path.Combine(Strings.XmlDirectory, Path.GetFileName(value));
+                        if (!value.StartsWith(Strings.XmlDirectory))
+                            _currentDataFile = Path.Combine(Strings.XmlDirectory, Path.GetFileName(value));
+
+                        if (Path.GetExtension(_currentDataFile).ToLower() != ".xml")
+                            _currentDataFile = Path.ChangeExtension(_currentDataFile, ".xml");
                     }
                     else
                         _currentDataFile = value;
@@ -68,12 +67,7 @@ namespace Quickening.ViewModels
             {
 #if DEBUG
                 if (_xmlData == null)
-                {
-                    XmlDataProvider dp = new XmlDataProvider();
-                    dp.Source = new Uri(CurrentDataFile);
-                    dp.XPath = "/root";
-                    _xmlData = dp;
-                }
+                    LoadXml(CurrentDataFile, false);
 #endif
                 return _xmlData;
             }
@@ -294,8 +288,10 @@ namespace Quickening.ViewModels
         /// Load a new XML file into the tree.
         /// </summary>
         /// <param name="xmlFileName"></param>
-        internal void LoadXml()
+        public void LoadXml(string fileName, bool update = true)
         {
+            CurrentDataFile = fileName;
+
             if (string.IsNullOrEmpty(CurrentDataFile))
                 return;
 
@@ -303,8 +299,12 @@ namespace Quickening.ViewModels
             {
                 XmlDataProvider dp = new XmlDataProvider();
                 dp.Source = new Uri(CurrentDataFile);
-                dp.XPath = "/root";
-                XmlData = dp;
+                dp.XPath = $"/{Strings.ROOT_TAG}";
+
+                if (update)
+                    XmlData = dp;
+                else
+                    _xmlData = dp;
             }
             catch (Exception ex)
             {
@@ -463,6 +463,5 @@ namespace Quickening.ViewModels
             CheckCanSave();
             SetEnabledControls();
         }
-
     }
 }

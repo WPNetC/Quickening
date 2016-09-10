@@ -138,15 +138,15 @@
 
     <!--  ComboBox\List Styles  -->
     <Style x:Key="DefaultComboBoxStyle" TargetType="{x:Type ComboBox}">
-        <Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
-        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
+        <!--<Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
+        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />-->
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
     </Style>
 
     <Style x:Key="DefaultComboBoxItemStyle" TargetType="{x:Type ComboBoxItem}">
-        <Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
-        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
+        <!--<Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
+        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />-->
     </Style>
     <!--    -->
 
@@ -161,8 +161,8 @@
     </Style>
 
     <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
+        <!--<Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />-->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -206,21 +206,21 @@
     </Style>
 
     <Style x:Key="ButtonStyle02" TargetType="{x:Type Button}">
-        <Setter Property="Background" Value="Black" />
-        <Setter Property="Foreground" Value="White" />
+        <!--<Setter Property="Background" Value="Black" />
+        <Setter Property="Foreground" Value="White" />-->
     </Style>
     <!--    -->
 
     <!--  Menu Styles  -->
     <Style x:Key="MainMenuStyle" TargetType="Menu">
-        <Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
-        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
+        <!--<Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
+        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />-->
         <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style x:Key="MainMenuItemStyle" TargetType="MenuItem">
-        <Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
-        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />
+        <!--<Setter Property="Background" Value="{Binding Source={StaticResource globalColors}, Path=DefaultGridBackground}" />
+        <Setter Property="Foreground" Value="{Binding Source={StaticResource globalColors}, Path=Col_DefaultText}" />-->
         <Setter Property="BorderThickness" Value="0" />
     </Style>
     <!--    -->

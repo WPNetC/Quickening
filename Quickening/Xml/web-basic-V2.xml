@@ -1,45 +1,36 @@
-﻿<__root__ version="2">
-  <sitefiles>
-    <styles include="false">
-      <sass>
-        <modules>
-          <__files__>
-            <_general.scss template-id=""/>
-          </__files__>
-        </modules>
-        <vendor></vendor>
-        <__files__>
-          <main.scss template-id=""/>
-          <_variables.scss template-id=""/>
-          <_mixin.scss template-id=""/>
-        </__files__>
-      </sass>
-    </styles>
-    <scripts include="false">
-      <modules></modules>
-      <vendor></vendor>
-      <__files__>
-        <main.js template-id="abcdef"/>
-        <constants.js template-id="defg"/>
-      </__files__>
-    </scripts>
-    <ng>
-      <modules>
-        <__files__>
-          <ngMain.js template-id=""/>
-        </__files__>
-      </modules>
-      <controllers>
-        <__files__>
-          <mainController.js template-id=""/>
-        </__files__>
-      </controllers>
-      <services></services>
-      <directives></directives>
-    </ng>
-    <__files__>
-      <gulpfile.js template-id=""/>
-      <packages.json template-id=""/>
-    </__files__>
-  </sitefiles>
-</__root__>
+﻿<root version="3">
+  <folder name="sitefiles">
+    <folder name="dist" include="false" />
+    <folder name="src">
+      <folder name="styles" include="false">
+        <folder name="sass">
+          <folder name="modules">
+            <file name="_general.scss" template-id=""/>
+          </folder>
+          <folder name="vendor"/>
+          <file name="main.scss" template-id=""/>
+          <file name="_variables.scss" template-id=""/>
+          <file name="_mixin.scss" template-id=""/>
+        </folder>
+      </folder>
+      <folder name="scripts" include="false">
+        <folder name="modules"/>
+        <folder name="vendor"/>
+        <file name="main.js" template-id="abcdef"/>
+        <file name="constants.js" template-id="defg"/>
+      </folder>
+      <folder name="ng">
+        <folder name="modules">
+          <file name="ngMain.js" template-id=""/>
+        </folder>
+        <folder name="controllers">
+          <file name="mainController.js" template-id=""/>
+        </folder>
+        <folder name="services"/>
+        <folder name="directives"/>
+      </folder>
+      <file name="gulpfile.js" template-id=""/>
+      <file name="packages.json" template-id=""/>
+    </folder>
+  </folder>
+</root>
