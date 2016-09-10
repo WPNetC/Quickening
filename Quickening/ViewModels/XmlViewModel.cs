@@ -58,6 +58,9 @@ namespace Quickening.ViewModels
             {
                 if (value != _xmlData)
                 {
+                    // Clear any previously selected node.
+                    SelectedNode = null;
+
                     _xmlData = value;
                     OnChanged();
                 }
@@ -105,6 +108,9 @@ namespace Quickening.ViewModels
                     NodeToProperties();
                     SetEnabledControls();
 
+                    // Can't save a newly loaded node as no changes made.
+                    CanSave = false;
+
                     OnChanged();
                 }
             }
@@ -121,6 +127,7 @@ namespace Quickening.ViewModels
                 {
                     _itemType = value;
                     OnChanged();
+                    CheckCanSave();
                 }
             }
         }
@@ -136,6 +143,7 @@ namespace Quickening.ViewModels
                 {
                     _itemName = value;
                     OnChanged();
+                    CheckCanSave();
                 }
             }
         }
@@ -156,6 +164,7 @@ namespace Quickening.ViewModels
                     CanEditTemplate = !string.IsNullOrEmpty(_templateId);
 
                     OnChanged();
+                    CheckCanSave();
                 }
             }
         }
@@ -171,6 +180,7 @@ namespace Quickening.ViewModels
                 {
                     _includeInProject = value;
                     OnChanged();
+                    CheckCanSave();
                 }
             }
         }
@@ -243,7 +253,7 @@ namespace Quickening.ViewModels
             }
             private set
             {
-                if(value != _canEditTemplate)
+                if (value != _canEditTemplate)
                 {
                     _canEditTemplate = value;
                     OnChanged();
@@ -303,9 +313,9 @@ namespace Quickening.ViewModels
         }
         internal void EditTemplate()
         {
-            
+
         }
-        
+
         /// <summary>
         /// Load a new XML file into the tree.
         /// </summary>
@@ -316,7 +326,7 @@ namespace Quickening.ViewModels
             // As this could potentially be null or empty we will use string.Replace instead of Path.GetFileName.
             if (xmlFileName.StartsWith(ProjectService.XmlDirectory))
                 xmlFileName = xmlFileName.Replace(ProjectService.XmlDirectory, "");
-            
+
             XmlDataProvider dp = new XmlDataProvider();
             var path = Path.Combine(ProjectService.XmlDirectory, xmlFileName ?? "web-basic-V3.xml");
             dp.Source = new Uri(path);
@@ -380,6 +390,50 @@ namespace Quickening.ViewModels
                 default:
                     break;
             }
+        }
+        /// <summary>
+        /// Check if any properties have changed and if so allow saving.
+        /// </summary>
+        private void CheckCanSave()
+        {
+            // If we have no node, or are at root we cannot save.
+            if(SelectedNode == null || SelectedNode?.Name == "root")
+            {
+                CanSave = false;
+                return;
+            }
+
+            // Check each property and if any have changed we can instantly set CanSave to true and return.
+            ProjectItemType itemType;
+            if (Enum.TryParse(SelectedNode?.Name, true, out itemType))
+            {
+                if (_itemType != itemType)
+                {
+                    CanSave = true;
+                    return;
+                }
+            }
+
+            if (_itemName != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.Name]]?.Value)
+            {
+                CanSave = true;
+                return;
+            }
+
+            if (_templateId != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value)
+            {
+                CanSave = true;
+                return;
+            }
+
+            // If we can't parse the value it should be because the attribute doesn't exist.
+            // In this case we default to true.
+            bool include;
+            if (!Boolean.TryParse(SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.Include]]?.Value, out include))
+                include = true;
+
+            // As this is the final check we can just set the value to the result.
+            CanSave = include != _includeInProject;
         }
     }
 }

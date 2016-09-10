@@ -8,7 +8,8 @@ namespace Quickening.Services
     public enum XmlAttributeName
     {
         Include,
-        TemplateId
+        TemplateId,
+        Name
     }
 
     internal static class ProjectService
@@ -21,7 +22,8 @@ namespace Quickening.Services
         public static readonly Dictionary<XmlAttributeName, string> Attributes = new Dictionary<XmlAttributeName, string>
         {
             { XmlAttributeName.TemplateId, "template-id" },
-            { XmlAttributeName.Include, "include" }
+            { XmlAttributeName.Include, "include" },
+            { XmlAttributeName.Name, "name" }
         };
 
         public static Project CurrentProject => IDEService.GetCurrentProject();
