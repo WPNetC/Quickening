@@ -43,18 +43,21 @@ namespace Quickening.Services
                 return null;
             }
         }
-
-        internal static void AddItemToProject(Project project, string relPath, string absPath)
+        /// <summary>
+        /// Adds an item to the current project.
+        /// </summary>
+        /// <param name="project">The current project.</param>
+        /// <param name="relPath">The relative path of the item to add.</param>
+        /// <param name="absPath">The absolute path of the item to add.</param>
+        /// <param name="isFile">If the absolute path relates to a file.</param>
+        internal static void AddItemToProject(Project project, string relPath, string absPath, bool isFile)
         {
             /*
              * We need to ensure any parent directories already exist before creating the new project item.
              * As we only have a relative path we will use string split to get the directories and then check them from the top down.
              * Linq also seems not to be an option, so the traversing needs to be done with loops.
              */
-
-            // Get if we are adding a file.
-            bool isFile = !string.IsNullOrEmpty(Path.GetExtension(relPath));
-
+             
             // Split relative path into directories and the file if it exists.
             // We need the relative path here as that is how the project manages its' items.
             var dirs = relPath.Split('\\');
@@ -64,7 +67,7 @@ namespace Quickening.Services
             foreach (var d in dirs)
             {
                 // Avoid creating folders out of files.
-                if (!string.IsNullOrEmpty(Path.GetExtension(d)))
+                if (isFile && !string.IsNullOrEmpty(Path.GetExtension(d)))
                     continue;
 
                 ProjectItem folder = null;

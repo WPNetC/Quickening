@@ -16,14 +16,11 @@ namespace Quickening.ViewModels
 {
     public class XmlViewModel : ViewModelBase
     {
-        private XmlNode _selectedNode;
         private XmlDataProvider _xmlData;
-        private bool _canUseTemplate;
-        private ProjectItemType _itemType;
-        private string _itemName;
-        private bool _includeInProject;
-        private string _templateId;
         private ObservableCollection<string> _templates;
+        private XmlNode _selectedNode;
+        private AttributeSet _nodeAttributes;
+        private bool _canUseTemplate;
         private bool _canSetType;
         private bool _canSetName;
         private bool _canSave;
@@ -32,12 +29,37 @@ namespace Quickening.ViewModels
         private ICommand _cmdSaveNode;
         private ICommand _cmdCreateNewTemplate;
         private ICommand _cmdEditTemplate;
+        private string _currentDataFile;
 
         public XmlViewModel()
         {
 
         }
 
+        public string CurrentDataFile
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_currentDataFile))
+                    _currentDataFile = Path.Combine(ProjectService.XmlDirectory, "web-basic-V3.xml");
+                return _currentDataFile;
+            }
+            set
+            {
+                if (value != _currentDataFile)
+                {
+                    // Ensure we have the full path to the Xml file.
+                    if (value != null && !value.StartsWith(ProjectService.XmlDirectory))
+                    {
+                        _currentDataFile = Path.Combine(ProjectService.XmlDirectory, Path.GetFileName(value));
+                    }
+                    else
+                        _currentDataFile = value;
+
+                    OnChanged();
+                }
+            }
+        }
         public XmlDataProvider XmlData
         {
             get
@@ -46,8 +68,7 @@ namespace Quickening.ViewModels
                 if (_xmlData == null)
                 {
                     XmlDataProvider dp = new XmlDataProvider();
-                    var path = Path.Combine(ProjectService.XmlDirectory, "web-basic-V3.xml");
-                    dp.Source = new Uri(path);
+                    dp.Source = new Uri(CurrentDataFile);
                     dp.XPath = "/root";
                     _xmlData = dp;
                 }
@@ -91,12 +112,6 @@ namespace Quickening.ViewModels
         {
             get
             {
-#if DEBUG
-                if (_selectedNode == null)
-                {
-                    _selectedNode = XmlData?.Document?.FirstChild;
-                }
-#endif
                 return _selectedNode;
             }
             set
@@ -105,7 +120,9 @@ namespace Quickening.ViewModels
                 {
                     _selectedNode = value;
 
-                    NodeToProperties();
+                    if (_selectedNode != null)
+                        NodeAttributes = AttributeSet.FromXmlNode(_selectedNode);
+
                     SetEnabledControls();
 
                     // Can't save a newly loaded node as no changes made.
@@ -115,72 +132,26 @@ namespace Quickening.ViewModels
                 }
             }
         }
-        public ProjectItemType ItemType
+        public AttributeSet NodeAttributes
         {
             get
             {
-                return _itemType;
+                return _nodeAttributes;
             }
-            set
+            private set
             {
-                if (value != _itemType)
+                if (value != _nodeAttributes)
                 {
-                    _itemType = value;
-                    OnChanged();
-                    CheckCanSave();
-                }
-            }
-        }
-        public string ItemName
-        {
-            get
-            {
-                return _itemName;
-            }
-            set
-            {
-                if (value != _itemName)
-                {
-                    _itemName = value;
-                    OnChanged();
-                    CheckCanSave();
-                }
-            }
-        }
-        public string Template
-        {
-            get
-            {
-                return _templateId;
-            }
-            set
-            {
-                if (value != _templateId)
-                {
-                    _templateId = value;
+                    if (_nodeAttributes != null)
+                        _nodeAttributes.PropertyChanged -= NodeAttributes_PropertyChanged;
 
-                    // Put this here as well as in the SetEnabledControls method
-                    // to ensure we catch any instances where this changes.
-                    CanEditTemplate = !string.IsNullOrEmpty(_templateId);
+                    _nodeAttributes = value;
 
-                    OnChanged();
                     CheckCanSave();
-                }
-            }
-        }
-        public bool IncludeInProject
-        {
-            get
-            {
-                return _includeInProject;
-            }
-            set
-            {
-                if (value != _includeInProject)
-                {
-                    _includeInProject = value;
                     OnChanged();
-                    CheckCanSave();
+
+                    if (_nodeAttributes != null)
+                        _nodeAttributes.PropertyChanged += NodeAttributes_PropertyChanged;
                 }
             }
         }
@@ -305,7 +276,8 @@ namespace Quickening.ViewModels
 
         internal void SaveNode()
         {
-
+            PropertiesToNode();
+            CanSave = false;
         }
         internal void CreateNewTemplate()
         {
@@ -320,18 +292,22 @@ namespace Quickening.ViewModels
         /// Load a new XML file into the tree.
         /// </summary>
         /// <param name="xmlFileName"></param>
-        internal void LoadXml(string xmlFileName)
+        internal void LoadXml()
         {
-            // Make sure we just have the file name to standardise the process.
-            // As this could potentially be null or empty we will use string.Replace instead of Path.GetFileName.
-            if (xmlFileName.StartsWith(ProjectService.XmlDirectory))
-                xmlFileName = xmlFileName.Replace(ProjectService.XmlDirectory, "");
+            if (string.IsNullOrEmpty(CurrentDataFile))
+                return;
 
-            XmlDataProvider dp = new XmlDataProvider();
-            var path = Path.Combine(ProjectService.XmlDirectory, xmlFileName ?? "web-basic-V3.xml");
-            dp.Source = new Uri(path);
-            dp.XPath = "/root";
-            XmlData = dp;
+            try
+            {
+                XmlDataProvider dp = new XmlDataProvider();
+                dp.Source = new Uri(CurrentDataFile);
+                dp.XPath = "/root";
+                XmlData = dp;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Error");
+            }
         }
 
         /// <summary>
@@ -342,22 +318,61 @@ namespace Quickening.ViewModels
             var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
             Templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
         }
+
         /// <summary>
         /// Sets the properties that are linked to the view based on the selected node.
         /// </summary>
-        private void NodeToProperties()
+        private void PropertiesToNode()
         {
-            ProjectItemType itemType;
-            Enum.TryParse(SelectedNode?.Name, true, out itemType);
+            if (SelectedNode == null ||
+                NodeAttributes == null ||
+                string.IsNullOrEmpty(NodeAttributes.ProjectItemName))
+                return;
 
-            bool include;
-            if (!Boolean.TryParse(SelectedNode?.Attributes["include"]?.Value, out include))
-                include = true;
+            // Take references to avoid chance of change.
+            var attrs = NodeAttributes;
+            var node = SelectedNode;
+            var doc = node.OwnerDocument;
 
-            ItemType = itemType;
-            ItemName = SelectedNode?.Attributes["name"]?.Value;
-            IncludeInProject = include;
-            Template = SelectedNode?.Attributes["template-id"]?.Value;
+            // Check if node types match, and if not create a new node.
+            if (attrs.NodeType.ToString().ToLower() != SelectedNode.Name?.ToLower())
+            {
+                // Create new node.
+                var newNode = doc.CreateNode(XmlNodeType.Element, attrs.NodeType.ToString().ToLower(), SelectedNode.NamespaceURI);
+
+                // Move any child nodes over.
+                var futureOrphans = node.ChildNodes.GetEnumerator();
+                while (futureOrphans.MoveNext())
+                {
+                    var orphan = futureOrphans.Current as XmlNode;
+                    if (orphan == null)
+                        continue;
+
+                    node.RemoveChild(orphan);
+                    newNode.AppendChild(orphan);
+                }
+
+                // Replace old node in parent.
+                node.ParentNode.ReplaceChild(newNode, node);
+                node = newNode;
+            }
+
+            // Set node name.
+            ((XmlElement)node).SetAttribute(ProjectService.Attributes[XmlAttributeName.Name], attrs.ProjectItemName);
+
+            // Set include property.
+            ((XmlElement)node).SetAttribute(ProjectService.Attributes[XmlAttributeName.Include], attrs.Include.ToString().ToLower());
+
+            // Set or remove template id.
+            if (!string.IsNullOrEmpty(attrs.TemplateId))
+                ((XmlElement)node).SetAttribute(ProjectService.Attributes[XmlAttributeName.TemplateId], attrs.TemplateId);
+            else if (node.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value != null)
+            {
+                ((XmlElement)node).RemoveAttribute(ProjectService.Attributes[XmlAttributeName.TemplateId]);
+            }
+
+            doc.Save(CurrentDataFile);
+            SelectedNode = node;
         }
         /// <summary>
         /// Sets the controls that are enabled on the view based on the currently selected node.
@@ -377,15 +392,16 @@ namespace Quickening.ViewModels
             // If we are not at root we can always set these values.
             CanSetName = CanSetInclude = true;
 
-            switch (ItemType)
+            switch (NodeAttributes.NodeType)
             {
                 case ProjectItemType.File:
                     CanSetType = true;
                     CanUseTemplate = true;
-                    CanEditTemplate = !string.IsNullOrEmpty(Template); // Can edit template only if there is a template to edit.
+                    CanEditTemplate = !string.IsNullOrEmpty(NodeAttributes.TemplateId); // Can edit template only if there is a template to edit.
                     break;
                 case ProjectItemType.Folder:
                     CanSetType = SelectedNode.ChildNodes.Count == 0; // Only allow to change type if no child objects as files cannot have children. (newtered)
+                    NodeAttributes.TemplateId = null; // Clear any template that might be set.
                     break;
                 default:
                     break;
@@ -396,8 +412,8 @@ namespace Quickening.ViewModels
         /// </summary>
         private void CheckCanSave()
         {
-            // If we have no node, or are at root we cannot save.
-            if(SelectedNode == null || SelectedNode?.Name == "root")
+            // If we have no node, or no attribute set, or are at root we cannot save.
+            if (SelectedNode == null || SelectedNode?.Name == "root" || NodeAttributes == null)
             {
                 CanSave = false;
                 return;
@@ -407,20 +423,20 @@ namespace Quickening.ViewModels
             ProjectItemType itemType;
             if (Enum.TryParse(SelectedNode?.Name, true, out itemType))
             {
-                if (_itemType != itemType)
+                if (NodeAttributes.NodeType != itemType)
                 {
                     CanSave = true;
                     return;
                 }
             }
 
-            if (_itemName != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.Name]]?.Value)
+            if (NodeAttributes.ProjectItemName != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.Name]]?.Value)
             {
                 CanSave = true;
                 return;
             }
 
-            if (_templateId != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value)
+            if (NodeAttributes.TemplateId != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value)
             {
                 CanSave = true;
                 return;
@@ -433,7 +449,18 @@ namespace Quickening.ViewModels
                 include = true;
 
             // As this is the final check we can just set the value to the result.
-            CanSave = include != _includeInProject;
+            CanSave = include != NodeAttributes.Include;
         }
+        /// <summary>
+        /// Handles when a property of the node attributes changes.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NodeAttributes_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            CheckCanSave();
+            SetEnabledControls();
+        }
+
     }
 }

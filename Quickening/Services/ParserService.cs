@@ -45,7 +45,7 @@ namespace Quickening.Services
             // Itterate through XML and populate list.
             foreach (XmlNode node in root.ChildNodes)
             {
-                var nodeDir = node.Attributes["name"].Value;
+                var nodeDir = node.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value;
                 paths.Add(nodeDir, AttributeSet.FromXmlNode(node));
 
                 var children = node.ChildNodes;
@@ -71,6 +71,10 @@ namespace Quickening.Services
             // Itterate through unique paths and create files and folders.
             foreach (var projectItem in projectItems)
             {
+                // Don't create a 'root' element as this is just a placeholder.
+                if (projectItem.Value.NodeType == Globals.ProjectItemType.Root)
+                    continue;
+
                 string absPath, relPath;
                 bool pathIsAbsolute = projectItem.Key.StartsWith(projectDirectory);
 
@@ -86,35 +90,36 @@ namespace Quickening.Services
                     relPath = projectItem.Key;
                 }
 
-                // If no extension it must be a directory.
-                if (string.IsNullOrEmpty(Path.GetExtension(absPath)))
+                // If item is a folder.
+                if (projectItem.Value.NodeType == Globals.ProjectItemType.Folder &&
+                    !Directory.Exists(absPath))
                 {
-                    if (!Directory.Exists(absPath))
-                    {
-                        // Both these methods create the directory, so we only want to use 1.
-                        if (projectItem.Value.Include)
-                            IDEService.AddItemToProject(project, relPath, absPath);
-                        else
-                            Directory.CreateDirectory(absPath);
-                    }
+                    // Both these methods create the directory, so we only want to use 1.
+                    if (projectItem.Value.Include)
+                        IDEService.AddItemToProject(project, relPath, absPath, false);
+                    else
+                        Directory.CreateDirectory(absPath);
+
                     continue;
                 }
-                // Otherwise it should be a file.
+
+                // If item is a file.
                 else if (!File.Exists(absPath))
                 {
                     // Check parent directory exists before creating file.
-                    var dir = Path.GetDirectoryName(absPath);
-                    if (!Directory.Exists(dir))
+                    var parentDir = Path.GetDirectoryName(absPath);
+                    if (!Directory.Exists(parentDir))
                     {
                         if (projectItem.Value.Include)
                         {
                             // Create relative path for parent directory.
-                            var parPath = projectItem.Key.StartsWith(dir) ? projectItem.Key.Replace(dir, "") : projectItem.Key;
+                            var parPath = projectItem.Key.StartsWith(parentDir) ? projectItem.Key.Replace(parentDir, "") : projectItem.Key;
+
                             // Add to solution. This also creates the item.
-                            IDEService.AddItemToProject(project, parPath, absPath);
+                            IDEService.AddItemToProject(project, parPath, absPath, true);
                         }
                         else
-                            Directory.CreateDirectory(dir);
+                            Directory.CreateDirectory(parentDir);
                     }
 
                     // If there is a template id.
@@ -128,11 +133,11 @@ namespace Quickening.Services
                         {
                             // Create file from template.
                             string text = File.ReadAllText(templatePath);
-                            
+
                             // Add to project if requested.
                             if (projectItem.Value.Include)
-                                IDEService.AddItemToProject(project, relPath, absPath);
-                            
+                                IDEService.AddItemToProject(project, relPath, absPath, true);
+
                             // Write template content to file.
                             File.WriteAllText(absPath, text);
 
@@ -141,7 +146,7 @@ namespace Quickening.Services
                         // If not we have an error, but don't need to throw an exception.
                         else
                         {
-                            System.Windows.Forms.MessageBox.Show("Cannot find template file: "+ templatePath + " for file '"+relPath+"'."
+                            System.Windows.Forms.MessageBox.Show("Cannot find template file: " + templatePath + " for file '" + relPath + "'."
                                 + "\r\n Empty file will be created instead.", "Error");
                         }
                     }
@@ -151,7 +156,7 @@ namespace Quickening.Services
 
                     // Add to project if requested.
                     if (projectItem.Value.Include)
-                        IDEService.AddItemToProject(project, relPath, absPath);
+                        IDEService.AddItemToProject(project, relPath, absPath, true);
                 }
             }
         }
@@ -159,63 +164,32 @@ namespace Quickening.Services
         private void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
         {
             // Don't use our own tags on paths
-            var rel = ProjectService.ReservedTagsXml.Contains(node.Attributes["name"].Value) ? "" : node.Attributes["name"].Value;
+            var rel = ProjectService.ReservedTagsXml.Contains(node.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value) ?
+                "" :
+                node.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value;
 
             // Go back up tree until we hit root node.
             var parent = node.ParentNode;
             while (parent != null &&
-                (parent.Name?.ToLower() != "root") && parent.Attributes["name"]?.Value?.ToLower() != "root")
+                (parent.Name?.ToLower() != ProjectService.ROOT_TAG) &&
+                parent.Attributes[ProjectService.Attributes[XmlAttributeName.Name]]?.Value?.ToLower() != ProjectService.ROOT_TAG)
             {
                 // Don't use our own tags in paths
-                if (!ProjectService.ReservedTagsXml.Contains(parent.Attributes["name"].Value))
-                    rel = Path.Combine(parent.Attributes["name"].Value, rel);
+                if (!ProjectService.ReservedTagsXml.Contains(parent.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value))
+                    rel = Path.Combine(parent.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value, rel);
                 parent = parent.ParentNode;
             }
 
-            // This seems to pass on all nodes. Seems text content might count as a child node.
             if (node.HasChildNodes)
             {
-                // If we are in the 'files' node.
-                if (node.Attributes["name"].Value.ToLower() == "__files__")
+                // Itterate through all sub directories and files.
+                foreach (XmlNode child in node.ChildNodes)
                 {
-                    // Itterate through each file node.
-                    foreach (XmlNode fileNode in node.ChildNodes)
-                    {
-                        // Generate relative path.
-                        //var filePath = fileNode.OwnerDocument.FirstChild.Attributes["version"].Value == "2" ?
-                        //    Path.Combine(rel, fileNode.Attributes["name"].Value) :
-                        //    Path.Combine(rel, fileNode.InnerText);
-
-                        var filePath = Path.Combine(rel, fileNode.Attributes["name"].Value);
-
-                        var fileAttrs = AttributeSet.FromXmlNode(fileNode);
-                        if (!paths.Keys.Contains(filePath))
-                            paths.Add(filePath, fileAttrs);
-                    }
-                }
-                // Otherwise it is a directory node.
-                else
-                {
-                    // Itterate through all sub directories and files.
-                    foreach (XmlNode child in node.ChildNodes)
-                    {
-                        AddPathsFromXmlNode(child, ref paths);
-                        var childAttrs = AttributeSet.FromXmlNode(child);
-                        if (!paths.Keys.Contains(rel))
-                            paths.Add(rel, childAttrs);
-                    }
-                }
-
-            }
-            // In case did not pass last check we are assuming it is an empty directory.
-            else
-            {
-                if (!paths.Keys.Contains(rel))
-                {
-                    var attrs = AttributeSet.FromXmlNode(node);
-                    paths.Add(rel, attrs);
+                    AddPathsFromXmlNode(child, ref paths);
                 }
             }
+            else if (!paths.Keys.Contains(rel))
+                    paths.Add(rel, AttributeSet.FromXmlNode(node));
         }
 
         #endregion

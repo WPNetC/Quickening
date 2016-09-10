@@ -14,11 +14,13 @@ namespace Quickening.Services
 
     internal static class ProjectService
     {
-        public const string ROOT_TAG = "__root__";
+        public const string ROOT_TAG = "root";
+        public const string FOLDER_TAG = "folder";
+        public const string FILE_TAG = "file";
         public const string IDE_FILE_GUID = "{6BB5F8EE-4483-11D3-8BCF-00C04F8EC28C}";
         public const string IDE_FOLDER_GUID = "{6BB5F8EF-4483-11D3-8BCF-00C04F8EC28C}";
 
-        public static readonly string[] ReservedTagsXml = { "__root__", "__file__", "__files__", "root", "folder", "file" };
+        public static readonly string[] ReservedTagsXml = { ROOT_TAG, FOLDER_TAG, FILE_TAG };
         public static readonly Dictionary<XmlAttributeName, string> Attributes = new Dictionary<XmlAttributeName, string>
         {
             { XmlAttributeName.TemplateId, "template-id" },

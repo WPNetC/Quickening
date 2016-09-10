@@ -142,7 +142,7 @@
                     Style="{StaticResource editPanelBorderStyle}">
                 <StackPanel Style="{StaticResource editPanelTextRowStyle}">
                     <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Type: " />
-                    <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}" SelectedValue="{Binding ItemType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}" SelectedValue="{Binding NodeAttributes.NodeType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
             </Border>
             <!--  Item name  -->
@@ -154,9 +154,9 @@
                     <TextBox HorizontalAlignment="Stretch"
                              HorizontalContentAlignment="Stretch"
                              Style="{StaticResource DefaultTextBoxStyle}"
-                             Text="{Binding Path=ItemName,
+                             Text="{Binding Path=NodeAttributes.ProjectItemName,
                                             Mode=TwoWay,
-                                            UpdateSourceTrigger=LostFocus}" />
+                                            UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
             </Border>
             <!--  Include in project  -->
@@ -168,7 +168,7 @@
                     <CheckBox Margin="4,0"
                               VerticalAlignment="Center"
                               VerticalContentAlignment="Center"
-                              IsChecked="{Binding IncludeInProject,
+                              IsChecked="{Binding Path=NodeAttributes.Include,
                                                   Mode=TwoWay,
                                                   UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
@@ -180,7 +180,7 @@
                 <StackPanel>
                     <StackPanel Style="{StaticResource editPanelTextRowStyle}">
                         <TextBlock Style="{StaticResource LabelTextStyle}" Text="Template: " />
-                        <ComboBox ItemsSource="{Binding Path=Templates}" SelectedValue="{Binding Path=Template, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBox ItemsSource="{Binding Path=Templates}" SelectedValue="{Binding Path=NodeAttributes.TemplateId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" />
