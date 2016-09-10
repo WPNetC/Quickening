@@ -1,4 +1,5 @@
 ﻿using Quickening.Globals;
+using Quickening.ICommands;
 using Quickening.Services;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Xml;
 
 namespace Quickening.ViewModels
@@ -26,6 +28,10 @@ namespace Quickening.ViewModels
         private bool _canSetName;
         private bool _canSave;
         private bool _canSetInclude;
+        private bool _canEditTemplate;
+        private ICommand _cmdSaveNode;
+        private ICommand _cmdCreateNewTemplate;
+        private ICommand _cmdEditTemplate;
 
         public XmlViewModel()
         {
@@ -57,6 +63,27 @@ namespace Quickening.ViewModels
                 }
             }
         }
+        public ObservableCollection<string> Templates
+        {
+            get
+            {
+                if (_templates == null)
+                {
+                    var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
+                    _templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
+                }
+                return _templates;
+            }
+            private set
+            {
+                if (value != _templates)
+                {
+                    _templates = value;
+                    OnChanged();
+                }
+            }
+        }
+
         public XmlNode SelectedNode
         {
             get
@@ -76,27 +103,73 @@ namespace Quickening.ViewModels
                     _selectedNode = value;
 
                     NodeToProperties();
+                    SetEnabledControls();
 
                     OnChanged();
                 }
             }
         }
-        public ObservableCollection<string> Templates
+        public ProjectItemType ItemType
         {
             get
             {
-                if (_templates == null)
-                {
-                    var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
-                    _templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
-                }
-                return _templates;
+                return _itemType;
             }
-            private set
+            set
             {
-                if (value != _templates)
+                if (value != _itemType)
                 {
-                    _templates = value;
+                    _itemType = value;
+                    OnChanged();
+                }
+            }
+        }
+        public string ItemName
+        {
+            get
+            {
+                return _itemName;
+            }
+            set
+            {
+                if (value != _itemName)
+                {
+                    _itemName = value;
+                    OnChanged();
+                }
+            }
+        }
+        public string Template
+        {
+            get
+            {
+                return _templateId;
+            }
+            set
+            {
+                if (value != _templateId)
+                {
+                    _templateId = value;
+
+                    // Put this here as well as in the SetEnabledControls method
+                    // to ensure we catch any instances where this changes.
+                    CanEditTemplate = !string.IsNullOrEmpty(_templateId);
+
+                    OnChanged();
+                }
+            }
+        }
+        public bool IncludeInProject
+        {
+            get
+            {
+                return _includeInProject;
+            }
+            set
+            {
+                if (value != _includeInProject)
+                {
+                    _includeInProject = value;
                     OnChanged();
                 }
             }
@@ -162,6 +235,21 @@ namespace Quickening.ViewModels
                 }
             }
         }
+        public bool CanEditTemplate
+        {
+            get
+            {
+                return _canEditTemplate;
+            }
+            private set
+            {
+                if(value != _canEditTemplate)
+                {
+                    _canEditTemplate = value;
+                    OnChanged();
+                }
+            }
+        }
         public bool CanSave
         {
             get
@@ -177,68 +265,51 @@ namespace Quickening.ViewModels
                 }
             }
         }
-
-        public ProjectItemType ItemType
+        public ICommand cmdSaveNode
         {
             get
             {
-                return _itemType;
-            }
-            set
-            {
-                if (value != _itemType)
-                {
-                    _itemType = value;
-                    OnChanged();
-                }
+                if (_cmdSaveNode == null)
+                    _cmdSaveNode = new SaveNode(this);
+                return _cmdSaveNode;
             }
         }
-        public string ItemName
+        public ICommand cmdCreateNewTemplate
         {
             get
             {
-                return _itemName;
-            }
-            set
-            {
-                if (value != _itemName)
-                {
-                    _itemName = value;
-                    OnChanged();
-                }
+                if (_cmdCreateNewTemplate == null)
+                    _cmdCreateNewTemplate = new CreateNewTemplate(this);
+                return _cmdCreateNewTemplate;
             }
         }
-        public string Template
+        public ICommand cmdEditTemplate
         {
             get
             {
-                return _templateId;
-            }
-            set
-            {
-                if (value != _templateId)
-                {
-                    _templateId = value;
-                    OnChanged();
-                }
-            }
-        }
-        public bool IncludeInProject
-        {
-            get
-            {
-                return _includeInProject;
-            }
-            set
-            {
-                if (value != _includeInProject)
-                {
-                    _includeInProject = value;
-                    OnChanged();
-                }
+                if (_cmdEditTemplate == null)
+                    _cmdEditTemplate = new EditTemplate(this);
+                return _cmdEditTemplate;
             }
         }
 
+        internal void SaveNode()
+        {
+
+        }
+        internal void CreateNewTemplate()
+        {
+
+        }
+        internal void EditTemplate()
+        {
+            
+        }
+        
+        /// <summary>
+        /// Load a new XML file into the tree.
+        /// </summary>
+        /// <param name="xmlFileName"></param>
         internal void LoadXml(string xmlFileName)
         {
             // Make sure we just have the file name to standardise the process.
@@ -252,12 +323,19 @@ namespace Quickening.ViewModels
             dp.XPath = "/root";
             XmlData = dp;
         }
-        internal void UpdateTemplateList()
+
+        /// <summary>
+        /// Update the list of available templates.
+        /// </summary>
+        private void UpdateTemplateList()
         {
             var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
             Templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
         }
-        internal void NodeToProperties()
+        /// <summary>
+        /// Sets the properties that are linked to the view based on the selected node.
+        /// </summary>
+        private void NodeToProperties()
         {
             ProjectItemType itemType;
             Enum.TryParse(SelectedNode?.Name, true, out itemType);
@@ -270,6 +348,38 @@ namespace Quickening.ViewModels
             ItemName = SelectedNode?.Attributes["name"]?.Value;
             IncludeInProject = include;
             Template = SelectedNode?.Attributes["template-id"]?.Value;
+        }
+        /// <summary>
+        /// Sets the controls that are enabled on the view based on the currently selected node.
+        /// </summary>
+        private void SetEnabledControls()
+        {
+            // Set all to false initially, then we just enable the ones we want.
+            CanSetType =
+                CanSetName =
+                CanSetInclude =
+                CanUseTemplate =
+                CanEditTemplate = false;
+
+            if (SelectedNode == null || SelectedNode.Name.ToLower() == "root") // This will only work with V3 XML format.
+                return;
+
+            // If we are not at root we can always set these values.
+            CanSetName = CanSetInclude = true;
+
+            switch (ItemType)
+            {
+                case ProjectItemType.File:
+                    CanSetType = true;
+                    CanUseTemplate = true;
+                    CanEditTemplate = !string.IsNullOrEmpty(Template); // Can edit template only if there is a template to edit.
+                    break;
+                case ProjectItemType.Folder:
+                    CanSetType = SelectedNode.ChildNodes.Count == 0; // Only allow to change type if no child objects as files cannot have children. (newtered)
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

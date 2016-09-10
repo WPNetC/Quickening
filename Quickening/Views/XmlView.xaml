@@ -192,17 +192,19 @@
                     <StackPanel HorizontalAlignment="Center" Style="{StaticResource editPanelButtonRowStyle}">
                         <Button Width="50"
                                 Margin="2,0"
+                                Command="{Binding cmdCreateNewTemplate}"
                                 Content="New" />
                         <Button Width="50"
                                 Margin="2,0"
+                                Command="{Binding cmdEditTemplate}"
                                 Content="Edit" />
                     </StackPanel>
                 </StackPanel>
             </Border>
             <Button Margin="5,0"
+                    Command="{Binding cmdSaveNode}"
                     Content="Save"
-                    DockPanel.Dock="Top"
-                    IsEnabled="{Binding CanSave}" />
+                    DockPanel.Dock="Top" />
         </DockPanel>
     </Grid>
 </UserControl>
