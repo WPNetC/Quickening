@@ -16,6 +16,7 @@ namespace Quickening.ViewModels
 {
     public class XmlViewModel : ViewModelBase
     {
+        #region Private Fields
         private XmlDataProvider _xmlData;
         private ObservableCollection<string> _templates;
         private XmlNode _selectedNode;
@@ -30,6 +31,7 @@ namespace Quickening.ViewModels
         private ICommand _cmdCreateNewTemplate;
         private ICommand _cmdEditTemplate;
         private string _currentDataFile;
+        #endregion
 
         public XmlViewModel()
         {

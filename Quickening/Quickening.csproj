@@ -55,6 +55,7 @@
     <Compile Include="AddWebDefaultsPackage.cs" />
     <Compile Include="Globals\AttributeSet.cs" />
     <Compile Include="Globals\Colours.cs" />
+    <Compile Include="Globals\Converters.cs" />
     <Compile Include="Globals\ProjectItemType.cs" />
     <Compile Include="Globals\XmlAttributeName.cs" />
     <Compile Include="ICommands.cs" />

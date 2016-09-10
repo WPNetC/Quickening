@@ -15,6 +15,7 @@ namespace Quickening.Globals
         public const string IDE_FOLDER_GUID = "{6BB5F8EF-4483-11D3-8BCF-00C04F8EC28C}";
 
         public static readonly string[] ReservedTagsXml = { ROOT_TAG, FOLDER_TAG, FILE_TAG };
+
         public static readonly Dictionary<XmlAttributeName, string> Attributes = new Dictionary<XmlAttributeName, string>
         {
             { XmlAttributeName.TemplateId, "template-id" },

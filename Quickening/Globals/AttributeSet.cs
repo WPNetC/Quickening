@@ -2,6 +2,7 @@
 using Quickening.Services;
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Xml;
 
 namespace Quickening
@@ -73,10 +74,17 @@ namespace Quickening
             }
             set
             {
-                if(value != _nodeType)
+                if(value != _nodeType && value != ProjectItemType.Root)
                 {
                     _nodeType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("NodeName"));
+                    OnChanged();
+                }
+                else if(_nodeType != ProjectItemType.Root)
+                {
+                    // Reset selection.
+                    var old = _nodeType;
+                    _nodeType = ProjectItemType.Root;
+                    NodeType = old;
                 }
             }
         }
@@ -95,7 +103,7 @@ namespace Quickening
                 if (value != _projectItemName)
                 {
                     _projectItemName = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ProjectItemName"));
+                    OnChanged();
                 }
             }
         }
@@ -115,7 +123,7 @@ namespace Quickening
                 if (value != _templateId)
                 {
                     _templateId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TemplateId"));
+                    OnChanged();
                 }
             }
         }
@@ -139,10 +147,14 @@ namespace Quickening
                 if (value != _include)
                 {
                     _include = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Include"));
+                    OnChanged();
                 }
             }
         }
         
+        private void OnChanged([CallerMemberName]string name = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 }
