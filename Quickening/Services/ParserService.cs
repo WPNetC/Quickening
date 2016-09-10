@@ -1,4 +1,5 @@
 ﻿using EnvDTE;
+using Quickening.Globals;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,8 +22,8 @@ namespace Quickening.Services
         public Dictionary<string, AttributeSet> PaseXML(string xmlPath, bool write = true)
         {
             // Take reference to project and directory to ensure it doesn't change mid method.
-            var project = ProjectService.CurrentProject;
-            string projectDirectory = ProjectService.ProjectDirectory;
+            var project = Strings.CurrentProject;
+            string projectDirectory = Strings.ProjectDirectory;
 
             // Read Xml file.
             var doc = new XmlDocument();
@@ -32,7 +33,7 @@ namespace Quickening.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Error");
                 return null;
             }
 
@@ -45,7 +46,7 @@ namespace Quickening.Services
             // Itterate through XML and populate list.
             foreach (XmlNode node in root.ChildNodes)
             {
-                var nodeDir = node.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value;
+                var nodeDir = node.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value;
                 paths.Add(nodeDir, AttributeSet.FromXmlNode(node));
 
                 var children = node.ChildNodes;
@@ -72,7 +73,7 @@ namespace Quickening.Services
             foreach (var projectItem in projectItems)
             {
                 // Don't create a 'root' element as this is just a placeholder.
-                if (projectItem.Value.NodeType == Globals.ProjectItemType.Root)
+                if (projectItem.Value.NodeType == ProjectItemType.Root)
                     continue;
 
                 string absPath, relPath;
@@ -91,7 +92,7 @@ namespace Quickening.Services
                 }
 
                 // If item is a folder.
-                if (projectItem.Value.NodeType == Globals.ProjectItemType.Folder &&
+                if (projectItem.Value.NodeType == ProjectItemType.Folder &&
                     !Directory.Exists(absPath))
                 {
                     // Both these methods create the directory, so we only want to use 1.
@@ -126,7 +127,7 @@ namespace Quickening.Services
                     if (!string.IsNullOrEmpty(projectItem.Value.TemplateId))
                     {
                         // Create path to template.
-                        var templatePath = Path.Combine(ProjectService.TemplatesDirectory, projectItem.Value.TemplateId + ".txt");
+                        var templatePath = Path.Combine(Strings.TemplatesDirectory, projectItem.Value.TemplateId + ".txt");
 
                         // Check template exists.
                         if (File.Exists(templatePath))
@@ -164,19 +165,19 @@ namespace Quickening.Services
         private void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
         {
             // Don't use our own tags on paths
-            var rel = ProjectService.ReservedTagsXml.Contains(node.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value) ?
+            var rel = Strings.ReservedTagsXml.Contains(node.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value) ?
                 "" :
-                node.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value;
+                node.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value;
 
             // Go back up tree until we hit root node.
             var parent = node.ParentNode;
             while (parent != null &&
-                (parent.Name?.ToLower() != ProjectService.ROOT_TAG) &&
-                parent.Attributes[ProjectService.Attributes[XmlAttributeName.Name]]?.Value?.ToLower() != ProjectService.ROOT_TAG)
+                (parent.Name?.ToLower() != Strings.ROOT_TAG) &&
+                parent.Attributes[Strings.Attributes[XmlAttributeName.Name]]?.Value?.ToLower() != Strings.ROOT_TAG)
             {
                 // Don't use our own tags in paths
-                if (!ProjectService.ReservedTagsXml.Contains(parent.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value))
-                    rel = Path.Combine(parent.Attributes[ProjectService.Attributes[XmlAttributeName.Name]].Value, rel);
+                if (!Strings.ReservedTagsXml.Contains(parent.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value))
+                    rel = Path.Combine(parent.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value, rel);
                 parent = parent.ParentNode;
             }
 

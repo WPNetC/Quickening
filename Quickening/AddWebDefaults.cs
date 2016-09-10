@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Quickening.Services;
 using System.Windows.Forms;
 using System.IO;
+using Quickening.Globals;
 
 namespace Quickening
 {
@@ -122,9 +123,9 @@ namespace Quickening
 
             if (dr == DialogResult.Yes)
             {
-                message = Directory.Exists(ProjectService.TemplatesDirectory) ? ProjectService.TemplatesDirectory : "Error";
+                message = Directory.Exists(Strings.TemplatesDirectory) ? Strings.TemplatesDirectory : "Error";
                 var ps = new ParserService();
-                var list = ps.PaseXML(Path.Combine(ProjectService.XmlDirectory, "web-basic-V3.xml"), true);
+                var list = ps.PaseXML(Path.Combine(Strings.XmlDirectory, "web-basic-V3.xml"), true);
 
                 // Show a message box to prove we were here
                 var result = VsShellUtilities.ShowMessageBox(

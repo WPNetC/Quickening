@@ -41,7 +41,7 @@ namespace Quickening.ViewModels
             get
             {
                 if (string.IsNullOrEmpty(_currentDataFile))
-                    _currentDataFile = Path.Combine(ProjectService.XmlDirectory, "web-basic-V3.xml");
+                    _currentDataFile = Path.Combine(Strings.XmlDirectory, "web-basic-V3.xml");
                 return _currentDataFile;
             }
             set
@@ -49,9 +49,9 @@ namespace Quickening.ViewModels
                 if (value != _currentDataFile)
                 {
                     // Ensure we have the full path to the Xml file.
-                    if (value != null && !value.StartsWith(ProjectService.XmlDirectory))
+                    if (value != null && !value.StartsWith(Strings.XmlDirectory))
                     {
-                        _currentDataFile = Path.Combine(ProjectService.XmlDirectory, Path.GetFileName(value));
+                        _currentDataFile = Path.Combine(Strings.XmlDirectory, Path.GetFileName(value));
                     }
                     else
                         _currentDataFile = value;
@@ -93,7 +93,7 @@ namespace Quickening.ViewModels
             {
                 if (_templates == null)
                 {
-                    var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
+                    var dInf = new DirectoryInfo(Strings.TemplatesDirectory);
                     _templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
                 }
                 return _templates;
@@ -315,7 +315,7 @@ namespace Quickening.ViewModels
         /// </summary>
         private void UpdateTemplateList()
         {
-            var dInf = new DirectoryInfo(ProjectService.TemplatesDirectory);
+            var dInf = new DirectoryInfo(Strings.TemplatesDirectory);
             Templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
         }
 
@@ -358,17 +358,17 @@ namespace Quickening.ViewModels
             }
 
             // Set node name.
-            ((XmlElement)node).SetAttribute(ProjectService.Attributes[XmlAttributeName.Name], attrs.ProjectItemName);
+            ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.Name], attrs.ProjectItemName);
 
             // Set include property.
-            ((XmlElement)node).SetAttribute(ProjectService.Attributes[XmlAttributeName.Include], attrs.Include.ToString().ToLower());
+            ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.Include], attrs.Include.ToString().ToLower());
 
             // Set or remove template id.
             if (!string.IsNullOrEmpty(attrs.TemplateId))
-                ((XmlElement)node).SetAttribute(ProjectService.Attributes[XmlAttributeName.TemplateId], attrs.TemplateId);
-            else if (node.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value != null)
+                ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.TemplateId], attrs.TemplateId);
+            else if (node.Attributes[Strings.Attributes[XmlAttributeName.TemplateId]]?.Value != null)
             {
-                ((XmlElement)node).RemoveAttribute(ProjectService.Attributes[XmlAttributeName.TemplateId]);
+                ((XmlElement)node).RemoveAttribute(Strings.Attributes[XmlAttributeName.TemplateId]);
             }
 
             doc.Save(CurrentDataFile);
@@ -430,13 +430,13 @@ namespace Quickening.ViewModels
                 }
             }
 
-            if (NodeAttributes.ProjectItemName != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.Name]]?.Value)
+            if (NodeAttributes.ProjectItemName != SelectedNode?.Attributes[Strings.Attributes[XmlAttributeName.Name]]?.Value)
             {
                 CanSave = true;
                 return;
             }
 
-            if (NodeAttributes.TemplateId != SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value)
+            if (NodeAttributes.TemplateId != SelectedNode?.Attributes[Strings.Attributes[XmlAttributeName.TemplateId]]?.Value)
             {
                 CanSave = true;
                 return;
@@ -445,7 +445,7 @@ namespace Quickening.ViewModels
             // If we can't parse the value it should be because the attribute doesn't exist.
             // In this case we default to true.
             bool include;
-            if (!Boolean.TryParse(SelectedNode?.Attributes[ProjectService.Attributes[XmlAttributeName.Include]]?.Value, out include))
+            if (!Boolean.TryParse(SelectedNode?.Attributes[Strings.Attributes[XmlAttributeName.Include]]?.Value, out include))
                 include = true;
 
             // As this is the final check we can just set the value to the result.

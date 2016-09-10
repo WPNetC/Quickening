@@ -36,22 +36,22 @@ namespace Quickening
         public static AttributeSet FromXmlNode(XmlNode node)
         {
             // Look for 'name' attribute, default to root as this should be only node with no name.
-            string name = node.Attributes[ProjectService.Attributes[XmlAttributeName.Name]]?.Value ?? "root";
+            string name = node.Attributes[Strings.Attributes[XmlAttributeName.Name]]?.Value ?? "root";
 
             // Look for 'template-id' attribute, default to empty.
-            string id = node.Attributes[ProjectService.Attributes[XmlAttributeName.TemplateId]]?.Value ?? "";
+            string id = node.Attributes[Strings.Attributes[XmlAttributeName.TemplateId]]?.Value ?? "";
 
             // Look for 'include' attribute, default to true.
             bool include;
-            if (!Boolean.TryParse(node.Attributes[ProjectService.Attributes[XmlAttributeName.Include]]?.Value, out include))
+            if (!Boolean.TryParse(node.Attributes[Strings.Attributes[XmlAttributeName.Include]]?.Value, out include))
                 include = true;
 
             // As we want to be able to exclude entire folders, run up the node tree to check if a parent is excluded.
             var parent = node.ParentNode;
-            while (include && (parent != null && parent.Name != ProjectService.ROOT_TAG))
+            while (include && (parent != null && parent.Name != Strings.ROOT_TAG))
             {
                 bool includeParent = true; // Seperate bool to get parent nodes setting.
-                if (bool.TryParse(parent.Attributes?[ProjectService.Attributes[XmlAttributeName.Include]]?.Value, out includeParent))
+                if (bool.TryParse(parent.Attributes?[Strings.Attributes[XmlAttributeName.Include]]?.Value, out includeParent))
                     include = includeParent; // Assigning parent value to 'include' will end loop if value is false.
 
                 parent = parent.ParentNode; // Step up XML tree.

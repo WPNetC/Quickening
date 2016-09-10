@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using static Quickening.Services.ProjectService;
+using static Quickening.Globals.Strings;
 
 namespace Quickening.Services
 {
@@ -43,6 +43,7 @@ namespace Quickening.Services
                 return null;
             }
         }
+
         /// <summary>
         /// Adds an item to the current project.
         /// </summary>

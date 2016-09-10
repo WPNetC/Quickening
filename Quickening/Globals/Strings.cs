@@ -1,18 +1,12 @@
 ﻿using EnvDTE;
+using Quickening.Services;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Quickening.Services
+namespace Quickening.Globals
 {
-    public enum XmlAttributeName
-    {
-        Include,
-        TemplateId,
-        Name
-    }
-
-    internal static class ProjectService
+    internal static class Strings
     {
         public const string ROOT_TAG = "root";
         public const string FOLDER_TAG = "folder";
