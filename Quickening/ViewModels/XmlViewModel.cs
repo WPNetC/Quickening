@@ -35,10 +35,6 @@ namespace Quickening.ViewModels
         {
             get
             {
-                if (string.IsNullOrEmpty(_currentDataFile))
-                    // Return default file.
-                    _currentDataFile = Path.Combine(Strings.XmlDirectory, "web-basic-V3.xml");
-
                 return _currentDataFile;
             }
             set
@@ -65,10 +61,9 @@ namespace Quickening.ViewModels
         {
             get
             {
-#if DEBUG
                 if (_xmlData == null)
                     LoadXml(CurrentDataFile, false);
-#endif
+
                 return _xmlData;
             }
             private set

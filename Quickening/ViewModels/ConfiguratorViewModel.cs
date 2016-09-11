@@ -25,8 +25,12 @@ namespace Quickening.ViewModels
         {
             get
             {
+                // Create a default view. May be removed if other views are added.
                 if (_currentView == null)
-                    _currentView = new XmlView();
+                {
+                    var view = new XmlView();
+                    _currentView = view;
+                }
 
                 return _currentView;
             }

@@ -7,9 +7,9 @@
              xmlns:local="clr-namespace:Quickening.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:vms="clr-namespace:Quickening.ViewModels"
              d:DesignHeight="300"
              d:DesignWidth="500"
-             xmlns:vms="clr-namespace:Quickening.ViewModels"
              mc:Ignorable="d">
     <UserControl.DataContext>
         <vms:XmlViewModel />
@@ -17,6 +17,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <cnv:ElementToBoolConverter x:Key="elemToBool" />
+            <BitmapImage x:Key="Icon_FolderClosed" UriSource="../ImageResources/Icons/FolderClosed.ico" />
             <ObjectDataProvider x:Key="dataFromEnum"
                                 MethodName="GetValues"
                                 ObjectType="{x:Type sys:Enum}">
@@ -25,7 +26,7 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../StylesDictionary.xaml" />
+                <ResourceDictionary Source="/Quickening;component/StylesDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -39,8 +40,9 @@
                 <Separator />
                 <MenuItem Header="Rename" />
             </x:Array>
+            <!--  Root  -->
             <HierarchicalDataTemplate DataType="root" ItemsSource="{Binding XPath=./*}">
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Height="20" Orientation="Horizontal">
                     <StackPanel.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Add Folder" />
@@ -53,8 +55,9 @@
                     <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
                 </StackPanel>
             </HierarchicalDataTemplate>
+            <!--  Folders  -->
             <HierarchicalDataTemplate DataType="folder" ItemsSource="{Binding XPath=./*}">
-                <DockPanel LastChildFill="False">
+                <DockPanel Height="20" LastChildFill="False">
                     <DockPanel.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Add Folder" />
@@ -64,7 +67,11 @@
                             <MenuItem Header="Delete" />
                         </ContextMenu>
                     </DockPanel.ContextMenu>
-                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <Image Width="16"
+                           Height="16"
+                           DockPanel.Dock="Left"
+                           Source="{DynamicResource FolderPlus}" />
+                    <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0" Text="Folder:" />
                         <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
                     </StackPanel>
@@ -76,8 +83,9 @@
                     </StackPanel>
                 </DockPanel>
             </HierarchicalDataTemplate>
+            <!--  Files  -->
             <HierarchicalDataTemplate DataType="file">
-                <DockPanel LastChildFill="False">
+                <DockPanel Height="20" LastChildFill="False">
                     <DockPanel.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Add Template" />
@@ -86,6 +94,10 @@
                             <MenuItem Header="Delete" />
                         </ContextMenu>
                     </DockPanel.ContextMenu>
+                    <Image Width="16"
+                           Height="16"
+                           DockPanel.Dock="Left"
+                           Source="{DynamicResource FilePlain}" />
                     <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                         <TextBlock Margin="0" Text="File:" />
                         <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
@@ -118,103 +130,113 @@
                       ItemsSource="{Binding}"
                       SelectedItemChanged="dirTree_SelectedItemChanged"
                       VirtualizingStackPanel.IsVirtualizing="False"
-                      VirtualizingStackPanel.VirtualizationMode="Standard" />
+                      VirtualizingStackPanel.VirtualizationMode="Standard">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="True" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView>
         </Grid>
 
-        <DockPanel Grid.Column="1" LastChildFill="False">
-            <DockPanel.Resources>
-                <Style x:Key="editPanelTextRowStyle" TargetType="StackPanel">
-                    <Setter Property="Orientation" Value="Vertical" />
-                    <Setter Property="Margin" Value="0,0,0,4" />
-                </Style>
-                <Style x:Key="editPanelButtonRowStyle" TargetType="StackPanel">
-                    <Setter Property="Orientation" Value="Horizontal" />
-                    <Setter Property="HorizontalAlignment" Value="Right" />
-                </Style>
-                <Style x:Key="editPanelBorderStyle"
-                       BasedOn="{StaticResource BorderStyleThin}"
-                       TargetType="Border">
-                    <Setter Property="Margin" Value="1,2" />
-                    <Setter Property="Padding" Value="4,6" />
-                </Style>
-            </DockPanel.Resources>
-            <TextBlock DockPanel.Dock="Top"
-                       Style="{StaticResource SubHeader}"
-                       Text="Item Details" />
-            <Border DockPanel.Dock="Top"
-                    IsEnabled="{Binding CanSetType}"
-                    Style="{StaticResource editPanelBorderStyle}">
-                <StackPanel Style="{StaticResource editPanelTextRowStyle}">
-                    <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Type: " />
-                    <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}" SelectedValue="{Binding NodeAttributes.NodeType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ComboBox.ItemContainerStyle>
-                            <Style TargetType="ComboBoxItem">
-                                <Setter Property="IsEnabled" Value="{Binding Path=Content, Converter={StaticResource elemToBool}, RelativeSource={RelativeSource Self}}" />
-                            </Style>
-                        </ComboBox.ItemContainerStyle>
-                    </ComboBox>
-                </StackPanel>
-            </Border>
-            <!--  Item name  -->
-            <Border DockPanel.Dock="Top"
-                    IsEnabled="{Binding CanSetName}"
-                    Style="{StaticResource editPanelBorderStyle}">
-                <StackPanel Style="{StaticResource editPanelTextRowStyle}">
-                    <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Name: " />
-                    <TextBox HorizontalAlignment="Stretch"
-                             HorizontalContentAlignment="Stretch"
-                             Style="{StaticResource DefaultTextBoxStyle}"
-                             Text="{Binding Path=NodeAttributes.ProjectItemName,
-                                            Mode=TwoWay,
-                                            UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </Border>
-            <!--  Include in project  -->
-            <Border DockPanel.Dock="Top"
-                    IsEnabled="{Binding CanSetInclude}"
-                    Style="{StaticResource editPanelBorderStyle}">
-                <StackPanel Orientation="Horizontal" Style="{StaticResource editPanelTextRowStyle}">
-                    <TextBlock Style="{StaticResource LabelTextStyle}" Text="Include in project: " />
-                    <CheckBox Margin="4,0"
-                              VerticalAlignment="Center"
-                              VerticalContentAlignment="Center"
-                              IsChecked="{Binding Path=NodeAttributes.Include,
-                                                  Mode=TwoWay,
-                                                  UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </Border>
-            <!--  Template Linking  -->
-            <Border DockPanel.Dock="Top"
-                    IsEnabled="{Binding CanUseTemplate}"
-                    Style="{StaticResource editPanelBorderStyle}">
-                <StackPanel>
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <DockPanel LastChildFill="False">
+                <DockPanel.Resources>
+                    <Style x:Key="editPanelTextRowStyle" TargetType="StackPanel">
+                        <Setter Property="Orientation" Value="Vertical" />
+                        <Setter Property="Margin" Value="0,0,0,4" />
+                    </Style>
+                    <Style x:Key="editPanelButtonRowStyle" TargetType="StackPanel">
+                        <Setter Property="Orientation" Value="Horizontal" />
+                        <Setter Property="HorizontalAlignment" Value="Right" />
+                    </Style>
+                    <Style x:Key="editPanelBorderStyle" TargetType="Border">
+                        <Setter Property="Margin" Value="1,2" />
+                        <Setter Property="Padding" Value="4,6" />
+                    </Style>
+                </DockPanel.Resources>
+                <TextBlock DockPanel.Dock="Top"
+                           Style="{StaticResource SubHeader}"
+                           Text="Item Details" />
+                <Border DockPanel.Dock="Top"
+                        IsEnabled="{Binding CanSetType}"
+                        Style="{StaticResource editPanelBorderStyle}">
                     <StackPanel Style="{StaticResource editPanelTextRowStyle}">
-                        <TextBlock Style="{StaticResource LabelTextStyle}" Text="Template: " />
-                        <ComboBox ItemsSource="{Binding Path=Templates}" SelectedValue="{Binding Path=NodeAttributes.TemplateId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
+                        <Image Width="16"
+                               Height="16"
+                               DockPanel.Dock="Left"
+                               Source="../Resources/Images/folder-6.png" />
+                        <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Type: " />
+                        <ComboBox ItemsSource="{Binding Source={StaticResource dataFromEnum}}" SelectedValue="{Binding NodeAttributes.NodeType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="IsEnabled" Value="{Binding Path=Content, Converter={StaticResource elemToBool}, RelativeSource={RelativeSource Self}}" />
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
                         </ComboBox>
+                    </StackPanel>
+                </Border>
+                <!--  Item name  -->
+                <Border DockPanel.Dock="Top"
+                        IsEnabled="{Binding CanSetName}"
+                        Style="{StaticResource editPanelBorderStyle}">
+                    <StackPanel Style="{StaticResource editPanelTextRowStyle}">
+                        <TextBlock Style="{StaticResource LabelTextStyle}" Text="Item Name: " />
+                        <TextBox HorizontalAlignment="Stretch"
+                                 HorizontalContentAlignment="Stretch"
+                                 Style="{StaticResource DefaultTextBoxStyle}"
+                                 Text="{Binding Path=NodeAttributes.ProjectItemName,
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </Border>
+                <!--  Include in project  -->
+                <Border DockPanel.Dock="Top"
+                        IsEnabled="{Binding CanSetInclude}"
+                        Style="{StaticResource editPanelBorderStyle}">
+                    <StackPanel Orientation="Horizontal" Style="{StaticResource editPanelTextRowStyle}">
+                        <TextBlock Style="{StaticResource LabelTextStyle}" Text="Include in project: " />
+                        <CheckBox Margin="4,0"
+                                  VerticalAlignment="Center"
+                                  VerticalContentAlignment="Center"
+                                  IsChecked="{Binding Path=NodeAttributes.Include,
+                                                      Mode=TwoWay,
+                                                      UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </Border>
+                <!--  Template Linking  -->
+                <Border DockPanel.Dock="Top"
+                        IsEnabled="{Binding CanUseTemplate}"
+                        Style="{StaticResource editPanelBorderStyle}">
+                    <StackPanel>
+                        <StackPanel Style="{StaticResource editPanelTextRowStyle}">
+                            <TextBlock Style="{StaticResource LabelTextStyle}" Text="Template: " />
+                            <ComboBox ItemsSource="{Binding Path=Templates}" SelectedValue="{Binding Path=NodeAttributes.TemplateId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
 
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Center" Style="{StaticResource editPanelButtonRowStyle}">
+                            <Button Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding cmdCreateNewTemplate}"
+                                    Content="New" />
+                            <Button Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding cmdEditTemplate}"
+                                    Content="Edit" />
+                        </StackPanel>
                     </StackPanel>
-                    <StackPanel HorizontalAlignment="Center" Style="{StaticResource editPanelButtonRowStyle}">
-                        <Button Width="50"
-                                Margin="2,0"
-                                Command="{Binding cmdCreateNewTemplate}"
-                                Content="New" />
-                        <Button Width="50"
-                                Margin="2,0"
-                                Command="{Binding cmdEditTemplate}"
-                                Content="Edit" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-            <Button Margin="5,0"
-                    Command="{Binding cmdSaveNode}"
-                    Content="Save"
-                    DockPanel.Dock="Top" />
-        </DockPanel>
+                </Border>
+                <Button Margin="5,0"
+                        Command="{Binding cmdSaveNode}"
+                        Content="Save"
+                        DockPanel.Dock="Top" />
+            </DockPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

@@ -58,7 +58,13 @@
                                               Mode=TwoWay,
                                               UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource cmbStyle}" />
-            <Button Content="New" Style="{StaticResource btnStyle}" />
+            <Button Content="New"
+                    DockPanel.Dock="Left"
+                    Style="{StaticResource btnStyle}" />
+            <Image Width="16"
+                   Height="16"
+                   DockPanel.Dock="Left"
+                   Source="{DynamicResource FolderPlus}" />
         </DockPanel>
         <!--  End Header  -->
 
