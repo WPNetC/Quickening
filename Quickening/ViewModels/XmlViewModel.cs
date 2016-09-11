@@ -2,6 +2,7 @@
 using Quickening.ICommands;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -306,10 +307,31 @@ namespace Quickening.ViewModels
 
         internal void CreateNewTemplate()
         {
+            var path = Path.Combine(Strings.TemplatesDirectory, "new-template.txt");
+            if (!File.Exists(path))
+                File.WriteAllText(path, "Enter contents...");
+
+            // Launch new file in notepad (doesn't seem to work in VS)
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo("notepad.exe", $"{path}");
+            process.StartInfo = startInfo;
+            process.Start();
         }
 
         internal void EditTemplate()
         {
+            if (string.IsNullOrEmpty(NodeAttributes.TemplateId))
+                return;
+
+            var path = Path.Combine(Strings.TemplatesDirectory, $"{NodeAttributes.TemplateId}.txt");
+            if (!File.Exists(path))
+                return;
+
+            // Launch new file in notepad (doesn't seem to work in VS)
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo("notepad.exe", $"{path}");
+            process.StartInfo = startInfo;
+            process.Start();
         }
 
         /// <summary>
