@@ -13,6 +13,7 @@ namespace Quickening.Globals
         public const string FILE_TAG = "file";
         public const string IDE_FILE_GUID = "{6BB5F8EE-4483-11D3-8BCF-00C04F8EC28C}";
         public const string IDE_FOLDER_GUID = "{6BB5F8EF-4483-11D3-8BCF-00C04F8EC28C}";
+        public const string NEW_TEMPLATE_FILENAME = "new-template.txt";
 
         public static readonly string[] ReservedTagsXml = { ROOT_TAG, FOLDER_TAG, FILE_TAG };
 

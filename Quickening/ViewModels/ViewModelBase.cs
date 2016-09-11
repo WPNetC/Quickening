@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace Quickening.ViewModels
 {
@@ -12,12 +13,17 @@ namespace Quickening.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private delegate void OnChangedDelegate(string p);
         protected virtual void OnChanged([CallerMemberName]string p = "")
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if (Application.Current.Dispatcher.CheckAccess())
             {
-                handler(this, new PropertyChangedEventArgs(p));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
+            }
+            else
+            {
+                var del = new OnChangedDelegate(OnChanged);
+                Application.Current.Dispatcher.Invoke(del, new[] { p });
             }
         }
 

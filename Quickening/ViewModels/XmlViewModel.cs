@@ -1,6 +1,8 @@
 ﻿using Quickening.Globals;
 using Quickening.ICommands;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -25,7 +27,7 @@ namespace Quickening.ViewModels
         private bool _canUseTemplate, _canSetType, _canSetName, _canSave, _canSetInclude, _canEditTemplate;
         private string _currentDataFile;
         private ICommand _cmdSaveNode, _cmdCreateNewTemplate, _cmdEditTemplate, _cmdAddItem, _cmdRemoveItem;
-
+        private string[] _oldTemplateSet;
         #endregion Private Fields
 
         public XmlViewModel()
@@ -86,10 +88,7 @@ namespace Quickening.ViewModels
             get
             {
                 if (_templates == null)
-                {
-                    var dInf = new DirectoryInfo(Strings.TemplatesDirectory);
-                    _templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
-                }
+                    UpdateTemplateList(false);
                 return _templates;
             }
             private set
@@ -307,15 +306,21 @@ namespace Quickening.ViewModels
 
         internal void CreateNewTemplate()
         {
-            var path = Path.Combine(Strings.TemplatesDirectory, "new-template.txt");
+            // We are using .txt files for templates currently.
+            var path = Path.Combine(Strings.TemplatesDirectory, Strings.NEW_TEMPLATE_FILENAME);
             if (!File.Exists(path))
-                File.WriteAllText(path, "Enter contents...");
+            {
+                // Warn user to save with new name.
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("This has created a text file in the templates folder.");
+                sb.AppendLine("Please save in this folder with a unique name, as otherwise this file may be ignored by the writting process.");
 
-            // Launch new file in notepad (doesn't seem to work in VS)
-            Process process = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo("notepad.exe", $"{path}");
-            process.StartInfo = startInfo;
-            process.Start();
+                File.WriteAllText(path, sb.ToString());
+            }
+            // Ensure file is read-only to promote saving as a new file.
+            File.SetAttributes(path, FileAttributes.ReadOnly);
+
+            LaunchTemplateEditor(path);
         }
 
         internal void EditTemplate()
@@ -323,15 +328,12 @@ namespace Quickening.ViewModels
             if (string.IsNullOrEmpty(NodeAttributes.TemplateId))
                 return;
 
-            var path = Path.Combine(Strings.TemplatesDirectory, $"{NodeAttributes.TemplateId}.txt");
-            if (!File.Exists(path))
-                return;
+            // For now all templates should be .txt files.
+            var path = NodeAttributes.TemplateId.ToLower().EndsWith(".txt") ?
+                Path.Combine(Strings.TemplatesDirectory, NodeAttributes.TemplateId) :
+                Path.Combine(Strings.TemplatesDirectory, $"{NodeAttributes.TemplateId}.txt");
 
-            // Launch new file in notepad (doesn't seem to work in VS)
-            Process process = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo("notepad.exe", $"{path}");
-            process.StartInfo = startInfo;
-            process.Start();
+            LaunchTemplateEditor(path);
         }
 
         /// <summary>
@@ -506,67 +508,94 @@ namespace Quickening.ViewModels
         /// <summary>
         /// Update the list of available templates.
         /// </summary>
-        private void UpdateTemplateList()
+        private void UpdateTemplateList(bool updateUI = true)
         {
             var dInf = new DirectoryInfo(Strings.TemplatesDirectory);
-            Templates = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name.Replace(p.Extension, "")));
-        }
 
+            // Get all text files.
+            var files = dInf.GetFiles("*.txt"); ;
+
+            // Create list using name and excludeing default\base template.
+            var list = new ObservableCollection<string>(files
+                .Where(p => Path.GetFileName(p.FullName) != Strings.NEW_TEMPLATE_FILENAME)
+                .Select(p => p.Name.Replace(p.Extension, "")));
+
+            if (updateUI)
+                Templates = list;
+            else _templates = list;
+
+            // Set list of templates for later comparison.
+            _oldTemplateSet = list.ToArray();
+
+        }
+        
         /// <summary>
         /// Sets the properties that are linked to the view based on the selected node.
         /// </summary>
         private void PropertiesToNode()
         {
-            if (SelectedNode == null ||
-                NodeAttributes == null ||
-                string.IsNullOrEmpty(NodeAttributes.ProjectItemName))
+            if (Application.Current == null)
                 return;
 
-            // Take references to avoid chance of change.
-            var attrs = NodeAttributes;
-            var node = SelectedNode;
-            var doc = node.OwnerDocument;
-
-            // Check if node types match, and if not create a new node.
-            if (attrs.NodeType.ToString().ToLower() != SelectedNode.Name?.ToLower())
+            if (Application.Current.Dispatcher.CheckAccess())
             {
-                // Create new node.
-                var newNode = doc.CreateNode(XmlNodeType.Element, attrs.NodeType.ToString().ToLower(), SelectedNode.NamespaceURI);
 
-                // Move any child nodes over.
-                var futureOrphans = node.ChildNodes.GetEnumerator();
-                while (futureOrphans.MoveNext())
+                if (SelectedNode == null ||
+                    NodeAttributes == null ||
+                    string.IsNullOrEmpty(NodeAttributes.ProjectItemName))
+                    return;
+
+                // Take references to avoid chance of change.
+                var attrs = NodeAttributes;
+                var node = SelectedNode;
+                var doc = node.OwnerDocument;
+
+                // Check if node types match, and if not create a new node.
+                if (attrs.NodeType.ToString().ToLower() != SelectedNode.Name?.ToLower())
                 {
-                    var orphan = futureOrphans.Current as XmlNode;
-                    if (orphan == null)
-                        continue;
+                    // Create new node.
+                    var newNode = doc.CreateNode(XmlNodeType.Element, attrs.NodeType.ToString().ToLower(), SelectedNode.NamespaceURI);
 
-                    node.RemoveChild(orphan);
-                    newNode.AppendChild(orphan);
+                    // Move any child nodes over.
+                    var futureOrphans = node.ChildNodes.GetEnumerator();
+                    while (futureOrphans.MoveNext())
+                    {
+                        var orphan = futureOrphans.Current as XmlNode;
+                        if (orphan == null)
+                            continue;
+
+                        node.RemoveChild(orphan);
+                        newNode.AppendChild(orphan);
+                    }
+
+                    // Replace old node in parent.
+                    node.ParentNode.ReplaceChild(newNode, node);
+                    node = newNode;
                 }
 
-                // Replace old node in parent.
-                node.ParentNode.ReplaceChild(newNode, node);
-                node = newNode;
+                // Set node name.
+                ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.Name], attrs.ProjectItemName);
+
+                // Set include property.
+                ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.Include], attrs.Include.ToString().ToLower());
+
+                // Set or remove template id.
+                if (!string.IsNullOrEmpty(attrs.TemplateId))
+                    ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.TemplateId], attrs.TemplateId);
+                else if (node.Attributes[Strings.Attributes[XmlAttributeName.TemplateId]]?.Value != null)
+                {
+                    ((XmlElement)node).RemoveAttribute(Strings.Attributes[XmlAttributeName.TemplateId]);
+                }
+
+                // Save new XML file and update selected node.
+                doc.Save(CurrentDataFile);
+                SelectedNode = node;
             }
-
-            // Set node name.
-            ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.Name], attrs.ProjectItemName);
-
-            // Set include property.
-            ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.Include], attrs.Include.ToString().ToLower());
-
-            // Set or remove template id.
-            if (!string.IsNullOrEmpty(attrs.TemplateId))
-                ((XmlElement)node).SetAttribute(Strings.Attributes[XmlAttributeName.TemplateId], attrs.TemplateId);
-            else if (node.Attributes[Strings.Attributes[XmlAttributeName.TemplateId]]?.Value != null)
+            else
             {
-                ((XmlElement)node).RemoveAttribute(Strings.Attributes[XmlAttributeName.TemplateId]);
+                var del = new System.Windows.Forms.MethodInvoker(PropertiesToNode);
+                System.Windows.Application.Current.Dispatcher.Invoke(del);
             }
-
-            // Save new XML file and update selected node.
-            doc.Save(CurrentDataFile);
-            SelectedNode = node;
         }
 
         /// <summary>
@@ -650,6 +679,53 @@ namespace Quickening.ViewModels
             CanSave = include != NodeAttributes.Include;
         }
 
+        private void LaunchTemplateEditor(string path)
+        {
+            if (!File.Exists(path))
+                return;
+
+            // Launch new file in notepad (doesn't seem to work in VS)
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo("notepad.exe", path);
+            process.EnableRaisingEvents = true;
+            process.StartInfo = startInfo;
+            process.Exited += TemplateEditor_Exited;
+            process.Start();
+        }
+
+        private void TemplateEditor_Exited(object sender, EventArgs e)
+        {
+            /*
+                Get list of any newly created files, with newest file at top.
+                It seems FileInfo does not compare correctly for this purpose, so we can't use Except().
+                As such we are using Where() to exclude files in a predefined list.
+            */
+            var dInf = new DirectoryInfo(Strings.TemplatesDirectory);
+            var newFiles = dInf.GetFiles("*.txt") // Get all text files.
+                .Where(p => Path.GetFileName(p.FullName) != Strings.NEW_TEMPLATE_FILENAME) // Exclude default template
+                .OrderByDescending(p => p.CreationTimeUtc) // Order by creation time.
+                .Select(p => p.Name.Replace(p.Extension, "")) // Select filename without extension
+                .Where(p => !_oldTemplateSet.Contains(p)) // Exclude old templates
+                .ToList(); // Make into list to prevent changing.
+
+            if (newFiles.Any())
+            {
+                // Update list after checks as this resets list of old templates.
+                // If we don't update here though, the new template is not available for selection.
+                UpdateTemplateList();
+
+                // Select newest file as template.
+                NodeAttributes.TemplateId = newFiles.First();
+                OnChanged("NodeAttributes");
+
+                // Set new template on node.
+                PropertiesToNode();
+
+                // Get rid of list of new files to free mem.
+                newFiles = null;
+            }
+        }
+
         /// <summary>
         /// Handles when a property of the node attributes changes.
         /// </summary>
@@ -660,5 +736,6 @@ namespace Quickening.ViewModels
             CheckCanSave();
             SetEnabledControls();
         }
+
     }
 }
