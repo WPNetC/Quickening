@@ -81,4 +81,58 @@ namespace Quickening.ICommands
         }
     }
     #endregion
+
+    #region Context Menu Commands
+    internal sealed class AddItem : ICommand
+    {
+        public AddItem(XmlViewModel vm)
+        {
+            this._vm = vm;
+        }
+
+        private XmlViewModel _vm;
+
+        bool ICommand.CanExecute(object parameter)
+        {
+            return true; // _vm.CanAddItem;
+        }
+
+        event EventHandler ICommand.CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        void ICommand.Execute(object parameter)
+        {
+            _vm.AddItem(parameter);
+        }
+    }
+    internal sealed class RemoveItem : ICommand
+    {
+        public RemoveItem(XmlViewModel vm)
+        {
+            this._vm = vm;
+        }
+
+        private XmlViewModel _vm;
+
+        bool ICommand.CanExecute(object parameter)
+        {
+            // As we are in a context menu, we must have a node selected, so can always remove.
+            return true;
+        }
+
+        event EventHandler ICommand.CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        void ICommand.Execute(object parameter)
+        {
+            _vm.RemoveItem();
+        }
+    }
+    #endregion
 }

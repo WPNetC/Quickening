@@ -1,13 +1,12 @@
 ﻿using Quickening.Globals;
 using Quickening.ICommands;
-using Quickening.Services;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Xml;
@@ -17,18 +16,19 @@ namespace Quickening.ViewModels
     public class XmlViewModel : ViewModelBase
     {
         #region Private Fields
+
         private XmlDataProvider _xmlData;
         private ObservableCollection<string> _templates;
         private XmlNode _selectedNode;
         private AttributeSet _nodeAttributes;
         private bool _canUseTemplate, _canSetType, _canSetName, _canSave, _canSetInclude, _canEditTemplate;
         private string _currentDataFile;
-        private ICommand _cmdSaveNode, _cmdCreateNewTemplate, _cmdEditTemplate;
-        #endregion
+        private ICommand _cmdSaveNode, _cmdCreateNewTemplate, _cmdEditTemplate, _cmdAddItem, _cmdRemoveItem;
+
+        #endregion Private Fields
 
         public XmlViewModel()
         {
-
         }
 
         public string CurrentDataFile
@@ -57,6 +57,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public XmlDataProvider XmlData
         {
             get
@@ -78,6 +79,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public ObservableCollection<string> Templates
         {
             get
@@ -123,6 +125,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public AttributeSet NodeAttributes
         {
             get
@@ -147,6 +150,8 @@ namespace Quickening.ViewModels
             }
         }
 
+        public bool CanAddItem { get; internal set; }
+
         public bool CanSetType
         {
             get
@@ -162,6 +167,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public bool CanSetName
         {
             get
@@ -177,6 +183,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public bool CanSetInclude
         {
             get
@@ -192,6 +199,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public bool CanUseTemplate
         {
             get
@@ -207,6 +215,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public bool CanEditTemplate
         {
             get
@@ -222,6 +231,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public bool CanSave
         {
             get
@@ -237,6 +247,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public ICommand cmdSaveNode
         {
             get
@@ -246,6 +257,7 @@ namespace Quickening.ViewModels
                 return _cmdSaveNode;
             }
         }
+
         public ICommand cmdCreateNewTemplate
         {
             get
@@ -255,6 +267,7 @@ namespace Quickening.ViewModels
                 return _cmdCreateNewTemplate;
             }
         }
+
         public ICommand cmdEditTemplate
         {
             get
@@ -265,18 +278,137 @@ namespace Quickening.ViewModels
             }
         }
 
+        public ICommand cmdAddItem
+        {
+            get
+            {
+                if (_cmdAddItem == null)
+                    _cmdAddItem = new AddItem(this);
+                return _cmdAddItem;
+            }
+        }
+
+        public ICommand cmdRemoveItem
+        {
+            get
+            {
+                if (_cmdRemoveItem == null)
+                    _cmdRemoveItem = new RemoveItem(this);
+                return _cmdRemoveItem;
+            }
+        }
+
         internal void SaveNode()
         {
             PropertiesToNode();
             CanSave = false;
         }
+
         internal void CreateNewTemplate()
         {
-
         }
+
         internal void EditTemplate()
         {
+        }
 
+        internal void AddItem(object parameter)
+        {
+            var btn = parameter as Button;
+            if (btn == null)
+                return;
+
+            var parent = LogicalTreeHelper.GetParent(btn) as StackPanel;
+            if (parent != null)
+            {
+                var textBox = parent.Children.OfType<TextBox>().First();
+                var text = textBox.Text;
+
+                ProjectItemType itemType;
+                if (textBox.Name.ToLower().Contains("folder"))
+                    itemType = ProjectItemType.Folder;
+                else if (textBox.Name.ToLower().Contains("file"))
+                    itemType = ProjectItemType.File;
+                else
+                    return;
+
+                // Create new node.
+                var newNode = SelectedNode.OwnerDocument.CreateNode(XmlNodeType.Element, itemType.ToString().ToLower(), SelectedNode.NamespaceURI);
+                // Set node name.
+                ((XmlElement)newNode).SetAttribute(Strings.Attributes[XmlAttributeName.Name], text);
+                // Append new node to selected node.
+                SelectedNode.AppendChild(newNode);
+                // Save XML file.
+                SelectedNode.OwnerDocument.Save(CurrentDataFile);
+                // Select the new node for editing.
+                SelectedNode = newNode;
+            }
+
+            // Close context menu
+            var upLevel = LogicalTreeHelper.GetParent(parent);
+            ContextMenu menu = upLevel as ContextMenu;
+            while (menu == null && upLevel != null)
+            {
+                upLevel = LogicalTreeHelper.GetParent(upLevel);
+                menu = upLevel as ContextMenu;
+            }
+            if (menu != null)
+            {
+                menu.IsOpen = false;
+            }
+        }
+
+        internal void RemoveItem()
+        {
+            if (SelectedNode == null)
+                return;
+
+            // Prevent removing root element and if attempted show an error.
+            if (SelectedNode.Name == Strings.ROOT_TAG)
+            {
+                MessageBox.Show("Cannot delete root element.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Check before removing folders that contain sub-items.
+            if (SelectedNode.ChildNodes.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("This folder is not empty.");
+                sb.AppendLine();
+                sb.AppendLine("Deleting this will also delete all sub-items.");
+                sb.AppendLine("Are you sure you wish to delete this folder?");
+
+                var dr = System.Windows.Forms.MessageBox.Show(
+                    sb.ToString(),
+                    "Folder not empty.",
+                    System.Windows.Forms.MessageBoxButtons.YesNo,
+                    System.Windows.Forms.MessageBoxIcon.Warning);
+
+                if (dr != System.Windows.Forms.DialogResult.Yes)
+                    return;
+            }
+
+            try
+            {
+                // Remove from either parent or document.
+                if (SelectedNode.ParentNode != null)
+                    SelectedNode.ParentNode.RemoveChild(SelectedNode);
+                else
+                    SelectedNode.OwnerDocument.RemoveChild(SelectedNode);
+
+                // Save updated XML to file.
+                if (!String.IsNullOrEmpty(CurrentDataFile))
+                    SelectedNode.OwnerDocument.Save(CurrentDataFile);
+                else MessageBox.Show("Could not find current XML file. Please deselect then reselect to try to reload.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}{Environment.NewLine}Could not remove node.{Environment.NewLine}Try to reload the file and try again.",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -368,9 +500,11 @@ namespace Quickening.ViewModels
                 ((XmlElement)node).RemoveAttribute(Strings.Attributes[XmlAttributeName.TemplateId]);
             }
 
+            // Save new XML file and update selected node.
             doc.Save(CurrentDataFile);
             SelectedNode = node;
         }
+
         /// <summary>
         /// Sets the controls that are enabled on the view based on the currently selected node.
         /// </summary>
@@ -396,14 +530,17 @@ namespace Quickening.ViewModels
                     CanUseTemplate = true;
                     CanEditTemplate = !string.IsNullOrEmpty(NodeAttributes.TemplateId); // Can edit template only if there is a template to edit.
                     break;
+
                 case ProjectItemType.Folder:
                     CanSetType = SelectedNode.ChildNodes.Count == 0; // Only allow to change type if no child objects as files cannot have children. (newtered)
                     NodeAttributes.TemplateId = null; // Clear any template that might be set.
                     break;
+
                 default:
                     break;
             }
         }
+
         /// <summary>
         /// Check if any properties have changed and if so allow saving.
         /// </summary>
@@ -448,6 +585,7 @@ namespace Quickening.ViewModels
             // As this is the final check we can just set the value to the result.
             CanSave = include != NodeAttributes.Include;
         }
+
         /// <summary>
         /// Handles when a property of the node attributes changes.
         /// </summary>

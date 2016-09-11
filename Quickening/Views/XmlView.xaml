@@ -8,16 +8,40 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:vms="clr-namespace:Quickening.ViewModels"
+             x:Name="xmlView"
              d:DesignHeight="300"
              d:DesignWidth="500"
              mc:Ignorable="d">
     <UserControl.DataContext>
         <vms:XmlViewModel />
     </UserControl.DataContext>
+
     <UserControl.Resources>
         <ResourceDictionary>
+            <glb:BindingProxy x:Key="proxy" Data="{Binding}" />
+            <ContextMenu x:Key="NodeContextMenu">
+                <MenuItem Header="Add Folder">
+                    <StackPanel x:Name="stkFolderMenu" Orientation="Horizontal">
+                        <TextBox x:Name="txtFolderName" Width="120" />
+                        <Button Command="{Binding Data.cmdAddItem,
+                                                  Source={StaticResource proxy}}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
+                                Content="Ok" />
+                    </StackPanel>
+                </MenuItem>
+                <MenuItem Header="Add File">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="txtFileName" Width="120" />
+                        <Button Command="{Binding Data.cmdAddItem,
+                                                  Source={StaticResource proxy}}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource Self}}"
+                                Content="Ok" />
+                    </StackPanel>
+                </MenuItem>
+                <Separator />
+                <MenuItem Command="{Binding Data.cmdRemoveItem, Source={StaticResource proxy}}" Header="Delete" />
+            </ContextMenu>
             <cnv:ElementToBoolConverter x:Key="elemToBool" />
-            <BitmapImage x:Key="Icon_FolderClosed" UriSource="../ImageResources/Icons/FolderClosed.ico" />
             <ObjectDataProvider x:Key="dataFromEnum"
                                 MethodName="GetValues"
                                 ObjectType="{x:Type sys:Enum}">
@@ -33,91 +57,61 @@
 
     <Grid x:Name="grdMain">
         <Grid.Resources>
+            <Style x:Key="stylTreeRowLabel"
+                   BasedOn="{StaticResource TreeRowText}"
+                   TargetType="TextBlock">
+                <Setter Property="Margin" Value="10,0,0,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="stylTreeRowValue"
+                   BasedOn="{StaticResource TreeRowText}"
+                   TargetType="TextBlock">
+                <Setter Property="Margin" Value="5,0,0,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
             <!--  Node templates  -->
-            <x:Array x:Key="treeMenuItems" Type="{x:Type sys:Object}">
-                <MenuItem Header="Add" />
-                <MenuItem Header="Delete" />
-                <Separator />
-                <MenuItem Header="Rename" />
-            </x:Array>
             <!--  Root  -->
             <HierarchicalDataTemplate DataType="root" ItemsSource="{Binding XPath=./*}">
+                <StackPanel Height="20"
+                            ContextMenu="{StaticResource NodeContextMenu}"
+                            Orientation="Horizontal">
+                    <TextBlock Style="{StaticResource stylTreeRowLabel}" Text="Root:" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+
+            <!--  Folders  -->
+            <HierarchicalDataTemplate DataType="folder" ItemsSource="{Binding XPath=./*}">
+                <StackPanel Height="20"
+                            ContextMenu="{StaticResource NodeContextMenu}"
+                            Orientation="Horizontal">
+                    <Image Width="16"
+                           Height="16"
+                           Source="{DynamicResource FolderPlus}" />
+                    <TextBlock Style="{StaticResource stylTreeRowValue}" Text="{Binding XPath=@name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+
+            <!--  Files  -->
+            <HierarchicalDataTemplate DataType="file">
                 <StackPanel Height="20" Orientation="Horizontal">
                     <StackPanel.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Add Folder" />
-                            <MenuItem Header="Add File" />
-                            <Separator />
-                            <MenuItem Header="Delete" />
+                            <MenuItem Command="{Binding Data.cmdRemoveItem, Source={StaticResource proxy}}" Header="Delete" />
                         </ContextMenu>
                     </StackPanel.ContextMenu>
-                    <TextBlock Margin="0" Text="Root:" />
-                    <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
+                    <Image Width="16"
+                           Height="16"
+                           Source="{DynamicResource FilePlain}" />
+                    <TextBlock Style="{StaticResource stylTreeRowValue}" Text="{Binding XPath=@name}" />
+
+                    <TextBlock Style="{StaticResource stylTreeRowLabel}" Text="Template: " />
+                    <TextBlock Style="{StaticResource stylTreeRowValue}" Text="{Binding XPath=@template-id}" />
                 </StackPanel>
             </HierarchicalDataTemplate>
-            <!--  Folders  -->
-            <HierarchicalDataTemplate DataType="folder" ItemsSource="{Binding XPath=./*}">
-                <DockPanel Height="20" LastChildFill="False">
-                    <DockPanel.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Add Folder" />
-                            <MenuItem Header="Add File" />
-                            <MenuItem Header="Rename" />
-                            <Separator />
-                            <MenuItem Header="Delete" />
-                        </ContextMenu>
-                    </DockPanel.ContextMenu>
-                    <Image Width="16"
-                           Height="16"
-                           DockPanel.Dock="Left"
-                           Source="{DynamicResource FolderPlus}" />
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="0" Text="Folder:" />
-                        <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
-                    </StackPanel>
-                    <StackPanel Margin="5,0,0,0"
-                                DockPanel.Dock="Left"
-                                Orientation="Horizontal">
-                        <TextBlock Margin="0" Text="Include:" />
-                        <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@include, FallbackValue=true, TargetNullValue=true}" />
-                    </StackPanel>
-                </DockPanel>
-            </HierarchicalDataTemplate>
-            <!--  Files  -->
-            <HierarchicalDataTemplate DataType="file">
-                <DockPanel Height="20" LastChildFill="False">
-                    <DockPanel.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Add Template" />
-                            <MenuItem Header="Rename" />
-                            <Separator />
-                            <MenuItem Header="Delete" />
-                        </ContextMenu>
-                    </DockPanel.ContextMenu>
-                    <Image Width="16"
-                           Height="16"
-                           DockPanel.Dock="Left"
-                           Source="{DynamicResource FilePlain}" />
-                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                        <TextBlock Margin="0" Text="File:" />
-                        <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@name}" />
-                    </StackPanel>
-                    <StackPanel Margin="5,0,0,0"
-                                DockPanel.Dock="Left"
-                                Orientation="Horizontal">
-                        <TextBlock Margin="0" Text="Include:" />
-                        <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@include, FallbackValue=true, TargetNullValue=true}" />
-                    </StackPanel>
-                    <StackPanel Margin="5,0,0,0"
-                                DockPanel.Dock="Left"
-                                Orientation="Horizontal">
-                        <TextBlock Margin="0" Text="Template:" />
-                        <TextBlock Margin="5,0,0,0" Text="{Binding XPath=@template-id, FallbackValue=No, TargetNullValue=No}" />
-                    </StackPanel>
-                </DockPanel>
-            </HierarchicalDataTemplate>
-            <!--  End Node templates  -->
+            <!--  End node templates  -->
         </Grid.Resources>
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="200" />
