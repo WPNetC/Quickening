@@ -142,4 +142,84 @@ namespace Quickening.ICommands
     }
 
     #endregion Context Menu Commands
+
+    #region Main Window Commands
+    internal sealed class NewXmlFile : ICommand
+    {
+        public NewXmlFile(ConfiguratorViewModel vm)
+        {
+            this._vm = vm;
+        }
+
+        private ConfiguratorViewModel _vm;
+
+        bool ICommand.CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        event EventHandler ICommand.CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        void ICommand.Execute(object parameter)
+        {
+            _vm.NewXmlFile();
+        }
+    }
+    internal sealed class SetAsDefault : ICommand
+    {
+        public SetAsDefault(ConfiguratorViewModel vm)
+        {
+            this._vm = vm;
+        }
+
+        private ConfiguratorViewModel _vm;
+
+        bool ICommand.CanExecute(object parameter)
+        {
+            return _vm.CanSetAsDefault;
+        }
+
+        event EventHandler ICommand.CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        void ICommand.Execute(object parameter)
+        {
+            _vm.SetAsDefault();
+        }
+    }
+    internal sealed class ImportExport : ICommand
+    {
+        public ImportExport(ConfiguratorViewModel vm)
+        {
+            this._vm = vm;
+        }
+
+        private ConfiguratorViewModel _vm;
+
+        bool ICommand.CanExecute(object parameter)
+        {
+            return parameter?.ToString().ToLower() == "import" ?
+                true :
+                _vm.CanSetAsDefault;
+        }
+
+        event EventHandler ICommand.CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        void ICommand.Execute(object parameter)
+        {
+            _vm.ImportExport(parameter);
+        }
+    }
+    #endregion
 }

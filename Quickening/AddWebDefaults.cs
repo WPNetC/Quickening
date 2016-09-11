@@ -124,16 +124,51 @@ namespace Quickening
 
             if (dr == DialogResult.Yes)
             {
-                message = Directory.Exists(Strings.TemplatesDirectory) ? Strings.TemplatesDirectory : "Error";
-                var ps = new ParserService();
-                var list = ps.PaseXML(Path.Combine(Strings.XmlDirectory, "web-basic-V3.xml"), true);
+                string resultMessage = "";
+                string resultTitle = "";
+                var defaultFile = Strings.DefaultXmlFile;
+                var path = Path.Combine(Strings.XmlDirectory, defaultFile);
+                OLEMSGICON icon;
 
-                // Show a message box to prove we were here
-                var result = VsShellUtilities.ShowMessageBox(
+                // Check we have a default XML file.
+                if (string.IsNullOrEmpty(defaultFile))
+                {
+                    resultTitle = "Warning";
+                    resultMessage = "No default layout file selected. Open configurator and select one.";
+                    icon = OLEMSGICON.OLEMSGICON_WARNING;
+                }
+                // Check the file exists.
+                else if (!File.Exists(path))
+                {
+                    resultTitle = "Error";
+                    resultMessage = "Default layout file not found on disk: " + path;
+                    icon = OLEMSGICON.OLEMSGICON_CRITICAL;
+                }
+                else
+                {
+                    // Try and create structure.
+                    try
+                    {
+                        var ps = new ParserService();
+                        var list = ps.PaseXML(path, true);
+
+                        resultTitle = "Success";
+                        resultMessage = "File structure created.";
+                        icon = OLEMSGICON.OLEMSGICON_INFO;
+                    }
+                    catch(Exception ex)
+                    {
+                        resultTitle = "Exception";
+                        resultMessage = ex.Message;
+                        icon = OLEMSGICON.OLEMSGICON_CRITICAL;
+                    }
+                }
+
+                VsShellUtilities.ShowMessageBox(
                     this.ServiceProvider,
-                    message,
-                    title,
-                    OLEMSGICON.OLEMSGICON_INFO,
+                    resultMessage,
+                    resultTitle,
+                    icon,
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             }

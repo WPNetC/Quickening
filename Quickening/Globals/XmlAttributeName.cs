@@ -4,6 +4,7 @@
     {
         Include,
         TemplateId,
-        Name
+        Name,
+        XmlVersion
     }
 }

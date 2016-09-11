@@ -50,7 +50,7 @@ namespace Quickening.ViewModels
                         if (!value.StartsWith(Strings.XmlDirectory))
                             _currentDataFile = Path.Combine(Strings.XmlDirectory, Path.GetFileName(value));
 
-                        if (Path.GetExtension(_currentDataFile).ToLower() != ".xml")
+                        if (Path.GetExtension(_currentDataFile)?.ToLower() != ".xml")
                             _currentDataFile = Path.ChangeExtension(_currentDataFile, ".xml");
                     }
                     else

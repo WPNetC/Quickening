@@ -29,13 +29,15 @@
             <RowDefinition Height="28" />
         </Grid.RowDefinitions>
         <!--  Header  -->
-        <DockPanel Grid.Row="0" LastChildFill="False">
+        <DockPanel Grid.Row="0"
+                   Margin="5,0"
+                   LastChildFill="False">
             <DockPanel.Resources>
                 <Style x:Key="lblStyle"
                        BasedOn="{StaticResource LabelTextStyle}"
                        TargetType="TextBlock">
                     <Setter Property="VerticalAlignment" Value="Center" />
-                    <Setter Property="Margin" Value="5,0" />
+                    <Setter Property="Margin" Value="0,0,5,0" />
                 </Style>
                 <Style x:Key="cmbStyle"
                        BasedOn="{StaticResource DefaultComboBoxStyle}"
@@ -45,7 +47,7 @@
                 </Style>
                 <Style x:Key="btnStyle" TargetType="Button">
                     <Setter Property="VerticalAlignment" Value="Center" />
-                    <Setter Property="Margin" Value="5,0" />
+                    <Setter Property="Margin" Value="5,0,0,0" />
                 </Style>
             </DockPanel.Resources>
             <TextBlock DockPanel.Dock="Left"
@@ -58,13 +60,28 @@
                                               Mode=TwoWay,
                                               UpdateSourceTrigger=PropertyChanged}"
                       Style="{StaticResource cmbStyle}" />
-            <Button Content="New"
+            <Button Command="{Binding cmdNewXmlFile,
+                                      Mode=OneWay}"
+                    Content="New"
                     DockPanel.Dock="Left"
                     Style="{StaticResource btnStyle}" />
-            <Image Width="16"
-                   Height="16"
-                   DockPanel.Dock="Left"
-                   Source="{DynamicResource FolderPlus}" />
+            <Button Command="{Binding cmdSetAsDefault,
+                                      Mode=OneWay}"
+                    Content="Set as default"
+                    DockPanel.Dock="Left"
+                    Style="{StaticResource btnStyle}" />
+            <Button Command="{Binding cmdImportExport,
+                                      Mode=OneWay}"
+                    CommandParameter="Export"
+                    Content="Export"
+                    DockPanel.Dock="Right"
+                    Style="{StaticResource btnStyle}" />
+            <Button Command="{Binding cmdImportExport,
+                                      Mode=OneWay}"
+                    CommandParameter="Import"
+                    Content="Import"
+                    DockPanel.Dock="Right"
+                    Style="{StaticResource btnStyle}" />
         </DockPanel>
         <!--  End Header  -->
 

@@ -1,0 +1,9 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Quickening.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DefaultXmlFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">web-basic-V3.xml</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
