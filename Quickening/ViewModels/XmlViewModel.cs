@@ -312,36 +312,54 @@ namespace Quickening.ViewModels
         {
         }
 
+        /// <summary>
+        /// Adds an item to the current XML tree, underneath the currently selected node.
+        /// <para>NOTE: This method makes many presumptions upon the Views' structure and format.
+        /// As such any changes to the View will likely break this method.</para>
+        /// </summary>
+        /// <param name="parameter"></param>
         internal void AddItem(object parameter)
         {
+            // Parametere should be the button that launched the command.
             var btn = parameter as Button;
-            if (btn == null)
+
+            // Check we have both a button and a node to use.
+            if (btn == null || SelectedNode == null)
                 return;
 
+            // As such it's parent should be a stackpanel.
             var parent = LogicalTreeHelper.GetParent(btn) as StackPanel;
             if (parent != null)
             {
+                // There should only be 1 textbox control.
                 var textBox = parent.Children.OfType<TextBox>().First();
-                var text = textBox.Text;
 
+                // If no text, exit here. We cannot create an element with no name.
+                if (string.IsNullOrEmpty(textBox?.Text))
+                    return;
+
+                // Name of control should contain type of item to add.
                 ProjectItemType itemType;
                 if (textBox.Name.ToLower().Contains("folder"))
                     itemType = ProjectItemType.Folder;
                 else if (textBox.Name.ToLower().Contains("file"))
                     itemType = ProjectItemType.File;
-                else
-                    return;
+                else return; // We should show an error here?
 
                 // Create new node.
                 var newNode = SelectedNode.OwnerDocument.CreateNode(XmlNodeType.Element, itemType.ToString().ToLower(), SelectedNode.NamespaceURI);
                 // Set node name.
-                ((XmlElement)newNode).SetAttribute(Strings.Attributes[XmlAttributeName.Name], text);
+                ((XmlElement)newNode).SetAttribute(Strings.Attributes[XmlAttributeName.Name], textBox.Text);
                 // Append new node to selected node.
                 SelectedNode.AppendChild(newNode);
                 // Save XML file.
                 SelectedNode.OwnerDocument.Save(CurrentDataFile);
+                // Reload XML file. (Seems to help prevent errors)
+                LoadXml(CurrentDataFile);
                 // Select the new node for editing.
                 SelectedNode = newNode;
+                // Clear text box for next input.
+                textBox.Text = "";
             }
 
             // Close context menu
@@ -370,24 +388,38 @@ namespace Quickening.ViewModels
                 return;
             }
 
-            // Check before removing folders that contain sub-items.
+            // Create message based on if there are subitems or not.
+            StringBuilder sb = new StringBuilder();
+            string title = "";
+            System.Windows.Forms.MessageBoxIcon icon;
             if (SelectedNode.ChildNodes.Count > 0)
             {
-                StringBuilder sb = new StringBuilder();
                 sb.AppendLine("This folder is not empty.");
                 sb.AppendLine();
                 sb.AppendLine("Deleting this will also delete all sub-items.");
                 sb.AppendLine("Are you sure you wish to delete this folder?");
 
-                var dr = System.Windows.Forms.MessageBox.Show(
-                    sb.ToString(),
-                    "Folder not empty.",
-                    System.Windows.Forms.MessageBoxButtons.YesNo,
-                    System.Windows.Forms.MessageBoxIcon.Warning);
-
-                if (dr != System.Windows.Forms.DialogResult.Yes)
-                    return;
+                title = "Folder not empty.";
+                icon = System.Windows.Forms.MessageBoxIcon.Warning;
             }
+            else
+            {
+                sb.AppendLine("Are you sure?");
+
+                title = "Delete object.";
+                icon = System.Windows.Forms.MessageBoxIcon.Question;
+            }
+
+            // Check before deleting using previous message settings.
+            var dr = System.Windows.Forms.MessageBox.Show(
+                sb.ToString(),
+                title,
+                System.Windows.Forms.MessageBoxButtons.YesNo,
+                icon);
+
+            if (dr != System.Windows.Forms.DialogResult.Yes)
+                return;
+
 
             try
             {
@@ -400,7 +432,13 @@ namespace Quickening.ViewModels
                 // Save updated XML to file.
                 if (!String.IsNullOrEmpty(CurrentDataFile))
                     SelectedNode.OwnerDocument.Save(CurrentDataFile);
-                else MessageBox.Show("Could not find current XML file. Please deselect then reselect to try to reload.");
+                else
+                {
+                    MessageBox.Show("Could not find current XML file. Please deselect then reselect to try to reload.");
+                    return;
+                }
+                // Reload XML file. (Seems to help prevent errors)
+                LoadXml(CurrentDataFile);
             }
             catch (Exception ex)
             {
@@ -415,7 +453,7 @@ namespace Quickening.ViewModels
         /// Load a new XML file into the tree.
         /// </summary>
         /// <param name="xmlFileName"></param>
-        public void LoadXml(string fileName, bool update = true)
+        public void LoadXml(string fileName, bool updateUI = true)
         {
             CurrentDataFile = fileName;
 
@@ -428,8 +466,13 @@ namespace Quickening.ViewModels
                 dp.Source = new Uri(CurrentDataFile);
                 dp.XPath = $"/{Strings.ROOT_TAG}";
 
-                if (update)
+                if (updateUI)
+                {
+                    // Clear selected node.
+                    SelectedNode = null;
+
                     XmlData = dp;
+                }
                 else
                     _xmlData = dp;
             }
