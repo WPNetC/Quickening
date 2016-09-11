@@ -18,7 +18,6 @@ namespace Quickening.Globals.Converters
             return s.ToLower() != Strings.ROOT_TAG;
         }
 
-
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException("Two way binding not supported.");

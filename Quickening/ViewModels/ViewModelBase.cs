@@ -22,7 +22,9 @@ namespace Quickening.ViewModels
         }
 
         #region IDisposable Support
+
         protected bool disposedValue = false;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -34,10 +36,12 @@ namespace Quickening.ViewModels
                 disposedValue = true;
             }
         }
+
         public void Dispose()
         {
             Dispose(true);
         }
+
         #endregion IDisposable Support
     }
 }

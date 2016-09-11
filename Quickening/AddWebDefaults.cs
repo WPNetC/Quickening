@@ -4,15 +4,15 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Quickening.Globals;
+using Quickening.Services;
 using System;
 using System.ComponentModel.Design;
 using System.Globalization;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Quickening.Services;
-using System.Windows.Forms;
 using System.IO;
-using Quickening.Globals;
+using System.Windows.Forms;
 
 namespace Quickening
 {
@@ -25,6 +25,7 @@ namespace Quickening
         /// Command IDs.
         /// </summary>
         public const int cmdidAddWebDefaults = 0x0100;
+
         public const int cmdidAddAngularModule = 0x105;
         public const int cmdidAddAngularController = 0x106;
         public const int cmdidAddAngularDirective = 0x107;
@@ -136,7 +137,6 @@ namespace Quickening
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             }
-
         }
 
         private void AddAngularModuleCallback(object sender, EventArgs e)
@@ -160,6 +160,7 @@ namespace Quickening
                 0,
                 out result);
         }
+
         private void AddAngularControllerCallback(object sender, EventArgs e)
         {
             IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(
@@ -181,6 +182,7 @@ namespace Quickening
                 0,
                 out result);
         }
+
         private void AddAngularServiceCallback(object sender, EventArgs e)
         {
             IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(
@@ -202,6 +204,7 @@ namespace Quickening
                 0,
                 out result);
         }
+
         private void AddAngularDirectiveCallback(object sender, EventArgs e)
         {
             IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(

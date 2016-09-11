@@ -4,9 +4,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using static Quickening.Globals.Strings;
 
 namespace Quickening.Services
 {
@@ -58,7 +56,7 @@ namespace Quickening.Services
              * As we only have a relative path we will use string split to get the directories and then check them from the top down.
              * Linq also seems not to be an option, so the traversing needs to be done with loops.
              */
-             
+
             // Split relative path into directories and the file if it exists.
             // We need the relative path here as that is how the project manages its' items.
             var dirs = relPath.Split('\\');

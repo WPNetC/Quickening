@@ -8,6 +8,7 @@ namespace Quickening.Globals
     public class Colours
     {
         #region Fields
+
         private static Brush _colHeaderText = Brushes.Gold;
         private static Brush _colLabelText = Brushes.DarkGray;
         private static Brush _colDefaultText = Brushes.LightGray;
@@ -17,11 +18,15 @@ namespace Quickening.Globals
 
         private static Brush _mainGridBkg = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF202020"));
         private static Brush _defaultGridBkg = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF272727"));
-        #endregion
 
-        public Colours() { }
+        #endregion Fields
+
+        public Colours()
+        {
+        }
 
         #region Text Colours
+
         public static Brush Col_HeaderText
         {
             get
@@ -85,9 +90,11 @@ namespace Quickening.Globals
                 }
             }
         }
-        #endregion
+
+        #endregion Text Colours
 
         #region Border Colours
+
         public static Brush Col_Border01
         {
             get
@@ -103,14 +110,18 @@ namespace Quickening.Globals
                 }
             }
         }
-        #endregion
+
+        #endregion Border Colours
 
         #region Buy / Sell Colours
+
         public static Brush BUYCOLOUR { get { return Brushes.DarkGreen; } }
         public static Brush SELLCOLOUR { get { return Brushes.DarkRed; } }
-        #endregion
+
+        #endregion Buy / Sell Colours
 
         #region Background Colours
+
         public static Brush MainGridBackground
         {
             get
@@ -126,6 +137,7 @@ namespace Quickening.Globals
                 }
             }
         }
+
         public static Brush DefaultGridBackground
         {
             get
@@ -141,9 +153,11 @@ namespace Quickening.Globals
                 }
             }
         }
-        #endregion
+
+        #endregion Background Colours
 
         #region Methods
+
         public static void SwitchColour(string name, Brush brush)
         {
             if (!string.IsNullOrEmpty(name.Trim()))
@@ -175,10 +189,12 @@ namespace Quickening.Globals
                 }
             }
         }
-        #endregion
+
+        #endregion Methods
 
         [field: NonSerialized]
         public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+
         private static void OnChanged([CallerMemberName]string p = "")
         {
             EventHandler<PropertyChangedEventArgs> handler = StaticPropertyChanged;

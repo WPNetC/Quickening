@@ -420,7 +420,6 @@ namespace Quickening.ViewModels
             if (dr != System.Windows.Forms.DialogResult.Yes)
                 return;
 
-
             try
             {
                 // Remove from either parent or document.

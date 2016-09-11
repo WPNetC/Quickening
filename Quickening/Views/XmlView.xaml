@@ -212,7 +212,6 @@
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Center" Style="{StaticResource editPanelButtonRowStyle}">
                             <Button Width="50"

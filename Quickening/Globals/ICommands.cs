@@ -5,6 +5,7 @@ using System.Windows.Input;
 namespace Quickening.ICommands
 {
     #region Xml View Model Commands
+
     internal sealed class SaveNode : ICommand
     {
         public SaveNode(XmlViewModel vm)
@@ -30,6 +31,7 @@ namespace Quickening.ICommands
             _vm.SaveNode();
         }
     }
+
     internal sealed class CreateNewTemplate : ICommand
     {
         public CreateNewTemplate(XmlViewModel vm)
@@ -55,6 +57,7 @@ namespace Quickening.ICommands
             _vm.CreateNewTemplate();
         }
     }
+
     internal sealed class EditTemplate : ICommand
     {
         public EditTemplate(XmlViewModel vm)
@@ -80,9 +83,11 @@ namespace Quickening.ICommands
             _vm.EditTemplate();
         }
     }
-    #endregion
+
+    #endregion Xml View Model Commands
 
     #region Context Menu Commands
+
     internal sealed class AddItem : ICommand
     {
         public AddItem(XmlViewModel vm)
@@ -108,6 +113,7 @@ namespace Quickening.ICommands
             _vm.AddItem(parameter);
         }
     }
+
     internal sealed class RemoveItem : ICommand
     {
         public RemoveItem(XmlViewModel vm)
@@ -134,5 +140,6 @@ namespace Quickening.ICommands
             _vm.RemoveItem();
         }
     }
-    #endregion
+
+    #endregion Context Menu Commands
 }

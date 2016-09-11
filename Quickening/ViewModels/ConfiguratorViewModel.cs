@@ -1,11 +1,7 @@
 ﻿using Quickening.Views;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace Quickening.ViewModels
@@ -18,7 +14,6 @@ namespace Quickening.ViewModels
 
         public ConfiguratorViewModel()
         {
-
         }
 
         public UserControl CurrentView
@@ -61,6 +56,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         public string CurrentXmlFile
         {
             get
@@ -89,6 +85,7 @@ namespace Quickening.ViewModels
                 }
             }
         }
+
         internal void LoadDataSets(bool update = true)
         {
             if (!Directory.Exists(Globals.Strings.XmlDirectory))

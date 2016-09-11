@@ -5,32 +5,32 @@
       <folder name="styles" include="false">
         <folder name="sass">
           <folder name="modules">
-            <file name="_general.scss" template-id=""/>
+            <file name="_general.scss" template-id="" />
           </folder>
-          <folder name="vendor"/>
-          <file name="main.scss" template-id=""/>
-          <file name="_variables.scss" template-id=""/>
-          <file name="_mixin.scss" template-id=""/>
+          <folder name="vendor" />
+          <file name="main.scss" template-id="" />
+          <file name="_variables.scss" template-id="" />
+          <file name="_mixin.scss" template-id="" />
         </folder>
       </folder>
       <folder name="scripts" include="false">
-        <folder name="modules"/>
-        <folder name="vendor"/>
-        <file name="main.js" template-id="abcdef"/>
-        <file name="constants.js" template-id="defg"/>
+        <folder name="modules" />
+        <folder name="vendor" />
+        <file name="main.js" template-id="abcdef" />
+        <file name="constants.js" template-id="defg" />
       </folder>
       <folder name="ng">
         <folder name="modules">
-          <file name="ngMain.js" template-id=""/>
+          <file name="ngMain.js" template-id="" />
         </folder>
         <folder name="controllers">
-          <file name="mainController.js" template-id=""/>
+          <file name="mainController.js" template-id="" />
         </folder>
-        <folder name="services"/>
-        <folder name="directives"/>
+        <folder name="services" />
+        <folder name="directives" />
       </folder>
-      <file name="gulpfile.js" template-id=""/>
-      <file name="packages.json" template-id=""/>
+      <file name="gulpfile.js" template-id="" />
+      <file name="packages.json" template-id="" />
     </folder>
   </folder>
 </root>

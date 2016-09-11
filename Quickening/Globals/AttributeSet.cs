@@ -1,5 +1,4 @@
 ﻿using Quickening.Globals;
-using Quickening.Services;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -74,12 +73,12 @@ namespace Quickening
             }
             set
             {
-                if(value != _nodeType && value != ProjectItemType.Root)
+                if (value != _nodeType && value != ProjectItemType.Root)
                 {
                     _nodeType = value;
                     OnChanged();
                 }
-                else if(_nodeType != ProjectItemType.Root)
+                else if (_nodeType != ProjectItemType.Root)
                 {
                     // Reset selection.
                     var old = _nodeType;
@@ -151,7 +150,7 @@ namespace Quickening
                 }
             }
         }
-        
+
         private void OnChanged([CallerMemberName]string name = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

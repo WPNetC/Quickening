@@ -190,12 +190,13 @@ namespace Quickening.Services
                 }
             }
             else if (!paths.Keys.Contains(rel))
-                    paths.Add(rel, AttributeSet.FromXmlNode(node));
+                paths.Add(rel, AttributeSet.FromXmlNode(node));
         }
 
-        #endregion
+        #endregion XML Methods
 
         #region JSON Method
+
         // JSON method not used. Left in case is decided to reimplement.
         // NOTE: Will require Newtonsoft if re-enabled.
         /*
@@ -299,6 +300,7 @@ namespace Quickening.Services
             }
         }
         */
-        #endregion
+
+        #endregion JSON Method
     }
 }
