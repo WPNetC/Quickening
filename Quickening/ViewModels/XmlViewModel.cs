@@ -16,6 +16,14 @@ using System.Xml;
 
 namespace Quickening.ViewModels
 {
+    /*
+     * This class is too large and needs refactoring.
+     * 
+     * There are cases of repetition of code, and methods that could be extracted into other classes.
+     * There are probably even areas that could be moved into other controls.
+     * 
+     * (Despite this, it works, and is a good example of how convoluted a (superficially) simple WPF\MVVM solutiion can end up.)
+     */
     public class XmlViewModel : ViewModelBase
     {
         #region Private Fields
@@ -323,9 +331,13 @@ namespace Quickening.ViewModels
             LaunchTemplateEditor(path);
         }
 
+        /// <summary>
+        /// Edit the current template of the selected node.
+        /// <para>DEVNOTE: This will currently exit without error if there is no template to edit.</para>
+        /// </summary>
         internal void EditTemplate()
         {
-            if (string.IsNullOrEmpty(NodeAttributes.TemplateId))
+            if (string.IsNullOrEmpty(NodeAttributes?.TemplateId))
                 return;
 
             // For now all templates should be .txt files.
@@ -338,7 +350,7 @@ namespace Quickening.ViewModels
 
         /// <summary>
         /// Adds an item to the current XML tree, underneath the currently selected node.
-        /// <para>NOTE: This method makes many presumptions upon the Views' structure and format.
+        /// <para>DEVNOTE: This method makes many presumptions upon the Views' structure and format.
         /// As such any changes to the View will likely break this method.</para>
         /// </summary>
         /// <param name="parameter"></param>
@@ -400,6 +412,9 @@ namespace Quickening.ViewModels
             }
         }
 
+        /// <summary>
+        /// Remove the currently selected node from the XML file.
+        /// </summary>
         internal void RemoveItem()
         {
             if (SelectedNode == null)
@@ -679,6 +694,11 @@ namespace Quickening.ViewModels
             CanSave = include != NodeAttributes.Include;
         }
 
+        /// <summary>
+        /// Launch the currently selected text editor of preference with the supplied path as the document to edit.
+        /// <para>DEVNOTE: Will currently exit without error if the file doesn't exit.</para>
+        /// </summary>
+        /// <param name="path">The absolute path to the file to edit.</param>
         private void LaunchTemplateEditor(string path)
         {
             if (!File.Exists(path))
@@ -693,6 +713,12 @@ namespace Quickening.ViewModels
             process.Start();
         }
 
+        /// <summary>
+        /// Handler to catch when the programe used to create or edit a template has exited.
+        /// <para>DEVNOTE: This is essential to update the list of templates after the user has created or edited a template.</para>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TemplateEditor_Exited(object sender, EventArgs e)
         {
             /*
@@ -727,7 +753,7 @@ namespace Quickening.ViewModels
         }
 
         /// <summary>
-        /// Handles when a property of the node attributes changes.
+        /// Handles when a property of the current nodes' attributes changes.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
