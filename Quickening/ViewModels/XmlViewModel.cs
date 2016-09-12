@@ -376,9 +376,9 @@ namespace Quickening.ViewModels
 
                 // Name of control should contain type of item to add.
                 ProjectItemType itemType;
-                if (textBox.Name.ToLower().Contains("folder"))
+                if (textBox.Name.ToLower().Contains(Strings.FOLDER_TAG))
                     itemType = ProjectItemType.Folder;
-                else if (textBox.Name.ToLower().Contains("file"))
+                else if (textBox.Name.ToLower().Contains(Strings.FILE_TAG))
                     itemType = ProjectItemType.File;
                 else return; // We should show an error here?
 
@@ -625,7 +625,7 @@ namespace Quickening.ViewModels
                 CanUseTemplate =
                 CanEditTemplate = false;
 
-            if (SelectedNode == null || SelectedNode.Name.ToLower() == "root") // This will only work with V3 XML format.
+            if (SelectedNode == null || SelectedNode.Name.ToLower() == Strings.ROOT_TAG)
                 return;
 
             // If we are not at root we can always set these values.
@@ -655,7 +655,7 @@ namespace Quickening.ViewModels
         private void CheckCanSave()
         {
             // If we have no node, or no attribute set, or are at root we cannot save.
-            if (SelectedNode == null || SelectedNode?.Name == "root" || NodeAttributes == null)
+            if (SelectedNode == null || SelectedNode?.Name == Strings.ROOT_TAG || NodeAttributes == null)
             {
                 CanSave = false;
                 return;

@@ -36,7 +36,7 @@ namespace Quickening
         public static AttributeSet FromXmlNode(XmlNode node)
         {
             // Look for 'name' attribute, default to root as this should be only node with no name.
-            string name = node.Attributes[Strings.Attributes[XmlAttributeName.Name]]?.Value ?? "root";
+            string name = node.Attributes[Strings.Attributes[XmlAttributeName.Name]]?.Value ?? Strings.ROOT_TAG;
 
             // Look for 'template-id' attribute, default to empty.
             string id = node.Attributes[Strings.Attributes[XmlAttributeName.TemplateId]]?.Value ?? "";
