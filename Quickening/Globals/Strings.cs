@@ -6,33 +6,111 @@ using System.Reflection;
 
 namespace Quickening.Globals
 {
+    /// <summary>
+    /// This class contains a combination of immutable and mutable strings.
+    /// These strings denote common properties and values.
+    /// <para>
+    /// DEVNOTE:
+    /// These should also provide standardisation, convinience and comparison bases for may processes and as such should be a cannon source of essential string vaules.
+    /// </para>
+    /// </summary>
     internal static class Strings
     {
+        #region Immutable
+        /// <summary>
+        /// Current version of the XML scheme.
+        /// </summary>
         public const int XmlLayoutVersion = 3;
+
+        /// <summary>
+        /// Current tag for the root element.
+        /// </summary>
         public const string ROOT_TAG = "root";
+
+        /// <summary>
+        /// Current tag for folder elements.
+        /// </summary>
         public const string FOLDER_TAG = "folder";
+
+        /// <summary>
+        /// Current tag for file elements.
+        /// </summary>
         public const string FILE_TAG = "file";
+
+        /// <summary>
+        /// VSs' guid for files when in a ProjectItems collection.
+        /// </summary>
         public const string IDE_FILE_GUID = "{6BB5F8EE-4483-11D3-8BCF-00C04F8EC28C}";
+
+        /// <summary>
+        /// VSs' guid for folders when in a ProjectItems collection.
+        /// </summary>
         public const string IDE_FOLDER_GUID = "{6BB5F8EF-4483-11D3-8BCF-00C04F8EC28C}";
+
+        /// <summary>
+        /// Current filename of the default template file.
+        /// <para>This should be excluded from any template lists\searches.</para>
+        /// </summary>
         public const string NEW_TEMPLATE_FILENAME = "new-template.txt";
+
+        /// <summary>
+        /// Filter of available extensions for use when (im\ex)porting layout files.
+        /// </summary>
         public const string LAYOUT_FILE_FILTER = "Xml files|*.xml";
 
-
+        /// <summary>
+        /// Array of resrved tags for the currently supported XML schemas.
+        /// </summary>
         public static readonly string[] ReservedTagsXml = { ROOT_TAG, FOLDER_TAG, FILE_TAG };
 
+        /// <summary>
+        /// Enum to string list of all XML attributes.
+        /// <para>This should be used in place of hard-coded values to imporove maintainability.</para>
+        /// </summary>
         public static readonly Dictionary<XmlAttributeName, string> Attributes = new Dictionary<XmlAttributeName, string>
         {
             { XmlAttributeName.TemplateId, "template-id" },
             { XmlAttributeName.Include, "include" },
             { XmlAttributeName.Name, "name" },
-            {XmlAttributeName.XmlVersion, "version" }
+            { XmlAttributeName.XmlVersion, "version" }
         };
 
+        /// <summary>
+        /// Returns the currently selected project.
+        /// </summary>
         public static Project CurrentProject => IDEService.GetCurrentProject();
+
+        /// <summary>
+        /// The path to the root folder of the currently selected project.
+        /// </summary>
         public static string ProjectDirectory => Path.GetDirectoryName(CurrentProject.FullName);
+
+        /// <summary>
+        /// The folder extension is installed to.
+        /// </summary>
         public static string ExtensionDirectory => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        /// <summary>
+        /// The folder the file templates are read from.
+        /// </summary>
         public static string TemplatesDirectory => Path.Combine(ExtensionDirectory, "Templates");
+
+        /// <summary>
+        /// The folder the XML structures are read from.
+        /// </summary>
         public static string XmlDirectory => Path.Combine(ExtensionDirectory, "Xml");
+
+        /// <summary>
+        /// Returns the current base XML structure.
+        /// </summary>
+        public static string BaseXmlText => $"<{ROOT_TAG} {Attributes[XmlAttributeName.XmlVersion]}=\"{XmlLayoutVersion}\"></{ROOT_TAG}>";
+        #endregion
+
+        #region Mutable
+        /// <summary>
+        /// Gets or sets the current default XML layout file.
+        /// <para>This is the file used by the 'Add Web Defaults' command.</para>
+        /// </summary>
         public static string DefaultXmlFile
         {
             get
@@ -60,7 +138,6 @@ namespace Quickening.Globals
                 Properties.Settings.Default.Save();
             }
         }
-
-        public static string BaseXmlText => $"<{ROOT_TAG} {Attributes[XmlAttributeName.XmlVersion]}=\"{XmlLayoutVersion}\"></{ROOT_TAG}>";
+        #endregion
     }
 }
