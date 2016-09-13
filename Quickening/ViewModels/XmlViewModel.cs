@@ -337,6 +337,7 @@ namespace Quickening.ViewModels
         /// </summary>
         internal void EditTemplate()
         {
+            // Exit if no template id.
             if (string.IsNullOrEmpty(NodeAttributes?.TemplateId))
                 return;
 
@@ -345,6 +346,11 @@ namespace Quickening.ViewModels
                 Path.Combine(Strings.TemplatesDirectory, NodeAttributes.TemplateId) :
                 Path.Combine(Strings.TemplatesDirectory, $"{NodeAttributes.TemplateId}.txt");
 
+            // Exit if file doesn't exist.
+            if (!File.Exists(path))
+                return;
+
+            // If we are here we should be good to launch the current editor.
             LaunchTemplateEditor(path);
         }
 
