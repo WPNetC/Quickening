@@ -362,7 +362,7 @@ namespace Quickening.ViewModels
         /// <param name="parameter"></param>
         internal void AddItem(object parameter)
         {
-            // Parametere should be the button that launched the command.
+            // Parameter should be the button that launched the command.
             var btn = parameter as Button;
 
             // Check we have both a button and a node to use.
@@ -455,7 +455,7 @@ namespace Quickening.ViewModels
                 icon = System.Windows.Forms.MessageBoxIcon.Question;
             }
 
-            // Check before deleting using previous message settings.
+            // Check before deleting (TODO: using previous message settings.)
             var dr = System.Windows.Forms.MessageBox.Show(
                 sb.ToString(),
                 title,
@@ -467,7 +467,8 @@ namespace Quickening.ViewModels
 
             try
             {
-                // Remove from either parent or document.
+                // Try to remove from either parent or document.
+                // This seems to fail sometimes, not sure why yet but suspect the XML tree bring out of sync with the view.
                 if (SelectedNode.ParentNode != null)
                     SelectedNode.ParentNode.RemoveChild(SelectedNode);
                 else
@@ -486,6 +487,7 @@ namespace Quickening.ViewModels
             }
             catch (Exception ex)
             {
+                // If we had an exception show an error promting user to reload XML file as this often fixes the problem.
                 MessageBox.Show($"Error: {ex.Message}{Environment.NewLine}Could not remove node.{Environment.NewLine}Try to reload the file and try again.",
                     "Error",
                     MessageBoxButton.OK,
@@ -495,8 +497,10 @@ namespace Quickening.ViewModels
 
         /// <summary>
         /// Load a new XML file into the tree.
+        ///<para>Optionally update the UI.</para>
         /// </summary>
-        /// <param name="xmlFileName"></param>
+        /// <param name="xmlFileName">The file to update from.</param>
+        /// <param name="updateUI">If we should also triggr a UI update.</param>
         public void LoadXml(string fileName, bool updateUI = true)
         {
             CurrentDataFile = fileName;
@@ -510,6 +514,8 @@ namespace Quickening.ViewModels
                 dp.Source = new Uri(CurrentDataFile);
                 dp.XPath = $"/{Strings.ROOT_TAG}";
 
+                // If we are updating the UI we want to update the property,
+                // otherwise we want to update the backing field.
                 if (updateUI)
                 {
                     // Clear selected node.
@@ -549,7 +555,7 @@ namespace Quickening.ViewModels
             _oldTemplateSet = list.ToArray();
 
         }
-        
+
         /// <summary>
         /// Sets the properties that are linked to the view based on the selected node.
         /// </summary>
