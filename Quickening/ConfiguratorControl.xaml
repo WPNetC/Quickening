@@ -52,7 +52,7 @@
             </DockPanel.Resources>
             <TextBlock DockPanel.Dock="Left"
                        Style="{StaticResource lblStyle}"
-                       Text="Quick Block" />
+                       Text="Layout" />
             <ComboBox x:Name="cmbQuickBlock"
                       DockPanel.Dock="Left"
                       ItemsSource="{Binding XmlFiles}"

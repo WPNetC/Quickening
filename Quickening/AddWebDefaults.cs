@@ -127,7 +127,7 @@ namespace Quickening
                 string resultMessage = "";
                 string resultTitle = "";
                 var defaultFile = Strings.DefaultXmlFile;
-                var path = Path.Combine(Strings.XmlDirectory, defaultFile);
+                var path = Path.Combine(Strings.LayoutsDirectory, defaultFile);
                 OLEMSGICON icon;
 
                 // Check we have a default XML file.

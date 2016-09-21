@@ -96,9 +96,9 @@ namespace Quickening.Globals
         public static string TemplatesDirectory => Path.Combine(ExtensionDirectory, "Templates");
 
         /// <summary>
-        /// The folder the XML structures are read from.
+        /// The folder the layout structures are read from.
         /// </summary>
-        public static string XmlDirectory => Path.Combine(ExtensionDirectory, "Xml");
+        public static string LayoutsDirectory => Path.Combine(ExtensionDirectory, "Layouts");
 
         /// <summary>
         /// Returns the current base XML structure.
@@ -115,7 +115,7 @@ namespace Quickening.Globals
         {
             get
             {
-                return Path.Combine(XmlDirectory, Properties.Settings.Default.DefaultXmlFile);
+                return Path.Combine(LayoutsDirectory, Properties.Settings.Default.DefaultXmlFile);
             }
             set
             {

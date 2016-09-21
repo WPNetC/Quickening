@@ -133,10 +133,10 @@ namespace Quickening.ViewModels
 
         internal void UpdateXmlFileList(bool updateUI = true)
         {
-            if (!Directory.Exists(Globals.Strings.XmlDirectory))
+            if (!Directory.Exists(Globals.Strings.LayoutsDirectory))
                 return;
 
-            var dInf = new DirectoryInfo(Globals.Strings.XmlDirectory);
+            var dInf = new DirectoryInfo(Globals.Strings.LayoutsDirectory);
             if (updateUI)
                 XmlFiles = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name));
             else
@@ -148,7 +148,7 @@ namespace Quickening.ViewModels
             var sfd = new System.Windows.Forms.SaveFileDialog();
             sfd.Filter = Strings.LAYOUT_FILE_FILTER;
             sfd.DefaultExt = ".xml";
-            sfd.InitialDirectory = Strings.XmlDirectory;
+            sfd.InitialDirectory = Strings.LayoutsDirectory;
 
             var result = sfd.ShowDialog();
             switch (result)
@@ -160,16 +160,16 @@ namespace Quickening.ViewModels
                         return;
 
                     // Ensure we copy to the Xml directory.
-                    if (Path.GetDirectoryName(path) != Strings.XmlDirectory)
+                    if (Path.GetDirectoryName(path) != Strings.LayoutsDirectory)
                     {
-                        path = Path.Combine(Strings.XmlDirectory, Path.GetFileName(sfd.FileName));
+                        path = Path.Combine(Strings.LayoutsDirectory, Path.GetFileName(sfd.FileName));
                     }
 
                     int num = 0;
                     while (File.Exists(path))
                     {
                         // If file already exists increment a version number to prevent exception.
-                        path = Path.Combine(Strings.XmlDirectory, $"{sfd.FileName.Replace(".xml", "")}_{++num}.xml");
+                        path = Path.Combine(Strings.LayoutsDirectory, $"{sfd.FileName.Replace(".xml", "")}_{++num}.xml");
                     }
 
                     // Write base tag to new file.
@@ -212,12 +212,12 @@ namespace Quickening.ViewModels
                 {
                     case System.Windows.Forms.DialogResult.OK:
                     case System.Windows.Forms.DialogResult.Yes:
-                        var path = Path.Combine(Strings.XmlDirectory, ofd.SafeFileName);
+                        var path = Path.Combine(Strings.LayoutsDirectory, ofd.SafeFileName);
                         int num = 0;
                         while (File.Exists(path))
                         {
                             // If file already exists increment a version number to prevent exception.
-                            path = Path.Combine(Strings.XmlDirectory, $"{ofd.SafeFileName.Replace(".xml", "")}_{++num}.xml");
+                            path = Path.Combine(Strings.LayoutsDirectory, $"{ofd.SafeFileName.Replace(".xml", "")}_{++num}.xml");
                         }
                         File.Copy(ofd.FileName, path);
                         UpdateXmlFileList();
@@ -243,9 +243,9 @@ namespace Quickening.ViewModels
                         while (File.Exists(path))
                         {
                             // If file already exists increment a version number to prevent exception.
-                            path = Path.Combine(Strings.XmlDirectory, $"{sfd.FileName.Replace(".xml", "")}_{++num}.xml");
+                            path = Path.Combine(Strings.LayoutsDirectory, $"{sfd.FileName.Replace(".xml", "")}_{++num}.xml");
                         }
-                        var xmlFile = Path.Combine(Strings.XmlDirectory, CurrentXmlFile);
+                        var xmlFile = Path.Combine(Strings.LayoutsDirectory, CurrentXmlFile);
                         if (!File.Exists(xmlFile))
                         {
                             var dr = System.Windows.MessageBox.Show(

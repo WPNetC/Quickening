@@ -1,0 +1,9 @@
+﻿<root version="3">
+  <folder name="sitefiles">
+    <folder name="ng">
+      <folder name="controllers">
+        <file name="{_[filename]_}" template-id="ngController"/>
+      </folder>
+    </folder>
+  </folder>
+</root>

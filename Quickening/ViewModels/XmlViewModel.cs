@@ -55,8 +55,8 @@ namespace Quickening.ViewModels
                     // Ensure we have the full and correct path to the Xml file.
                     if (value != null)
                     {
-                        if (!value.StartsWith(Strings.XmlDirectory))
-                            _currentDataFile = Path.Combine(Strings.XmlDirectory, Path.GetFileName(value));
+                        if (!value.StartsWith(Strings.LayoutsDirectory))
+                            _currentDataFile = Path.Combine(Strings.LayoutsDirectory, Path.GetFileName(value));
 
                         if (Path.GetExtension(_currentDataFile)?.ToLower() != ".xml")
                             _currentDataFile = Path.ChangeExtension(_currentDataFile, ".xml");
