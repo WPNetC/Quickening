@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Quickening.Globals;
 using Quickening.Services;
+using Quickening.Views;
 using System;
 using System.ComponentModel.Design;
 using System.Globalization;
@@ -201,8 +202,18 @@ namespace Quickening
             var layout = "NgController.xml";
             var path = Path.Combine(Strings.AngularDirectory, layout);
 
-            var ps = new ParserService();
-            ps.PaseXML(path, true);
+            using (var tbp = new TextInputPopUp("Filename", "Module", "Controller Name", "Function Name"))
+            {
+                var dr = tbp.ShowDialog();
+
+                if (dr == true)
+                {
+                    var fileName = tbp.Values[0][1];
+                    var modName = tbp.Values[1][1];
+                    var ctrlName = tbp.Values[2][1];
+                    var fnName = tbp.Values[3][1];
+                }
+            } 
         }
 
         private void AddAngularServiceCallback(object sender, EventArgs e)
