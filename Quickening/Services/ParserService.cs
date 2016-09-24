@@ -1,6 +1,7 @@
 ﻿using EnvDTE;
 using Quickening.Globals;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -67,8 +68,10 @@ namespace Quickening.Services
         /// </summary>
         /// <param name="projectDirectory"></param>
         /// <param name="projectItems"></param>
-        public void WriteStructure(Project project, string projectDirectory, Dictionary<string, AttributeSet> projectItems)
+        public List<string> WriteStructure(Project project, string projectDirectory, IEnumerable<KeyValuePair<string, AttributeSet>> projectItems)
         {
+            var resultingPaths = new List<string>();
+
             // Itterate through unique paths and create files and folders.
             foreach (var projectItem in projectItems)
             {
@@ -90,6 +93,9 @@ namespace Quickening.Services
                     absPath = Path.Combine(projectDirectory, projectItem.Key);
                     relPath = projectItem.Key;
                 }
+
+                // Add absolute path to list of results.
+                resultingPaths.Add(absPath);
 
                 // If item is a folder.
                 if (projectItem.Value.NodeType == ProjectItemType.Folder &&
@@ -160,19 +166,21 @@ namespace Quickening.Services
                         IDEService.AddItemToProject(project, relPath, absPath, true);
                 }
             }
+
+            return resultingPaths;
         }
 
-        private void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
+        public void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
         {
             // Don't use our own tags on paths
             var rel = Strings.ReservedTagsXml.Contains(node.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value) ?
                 "" :
                 node.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value;
 
-            // Go back up tree until we hit root node.
+            // Go back up tree until we hit root node to create relative path.
             var parent = node.ParentNode;
             while (parent != null &&
-                (parent.Name?.ToLower() != Strings.ROOT_TAG) &&
+                parent.Name?.ToLower() != Strings.ROOT_TAG &&
                 parent.Attributes[Strings.Attributes[XmlAttributeName.Name]]?.Value?.ToLower() != Strings.ROOT_TAG)
             {
                 // Don't use our own tags in paths

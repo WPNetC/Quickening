@@ -3,11 +3,11 @@
 
     angular
         .module('{_[ngModule]_}')
-        .controller('{_[filename]_}', {_[filename]_});
+        .controller('{_[ngController]_}', {_[ngController]_});
 
-    {_[filename]_}.$inject = ['$location']; 
+    {_[ngController]_}.$inject = ['$location']; 
 
-    function {_[filename]_}($location) {
+    function {_[ngController]_}($location) {
         /* jshint validthis:true */
         var vm = this;
 

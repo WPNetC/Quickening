@@ -128,7 +128,8 @@ namespace Quickening
                 string resultTitle = "";
                 string resultMessage = "";
                 OLEMSGICON icon;
-                var defaultFile = Strings.DefaultXmlFile;
+
+                var defaultFile = Strings.DefaultXmlFile ?? "";
                 var path = Path.Combine(Strings.LayoutsDirectory, defaultFile);
 
                 // Check we have a default XML file.
@@ -157,7 +158,7 @@ namespace Quickening
                         resultMessage = "File structure created.";
                         icon = OLEMSGICON.OLEMSGICON_INFO;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         resultTitle = "Exception";
                         resultMessage = ex.Message;
@@ -199,21 +200,45 @@ namespace Quickening
 
         private void AddAngularControllerCallback(object sender, EventArgs e)
         {
+            string resultTitle = "";
+            string resultMessage = "";
+            OLEMSGICON icon = OLEMSGICON.OLEMSGICON_CRITICAL;
+
             var layout = "NgController.xml";
             var path = Path.Combine(Strings.AngularDirectory, layout);
 
-            using (var tbp = new TextInputPopUp("Filename", "Module", "Controller Name", "Function Name"))
+            if (!File.Exists(path))
             {
-                var dr = tbp.ShowDialog();
-
-                if (dr == true)
+                resultTitle = "Error";
+                resultMessage = "Layout file not found on disk: " + path;
+            }
+            else
+            {
+                try
                 {
-                    var fileName = tbp.Values[0][1];
-                    var modName = tbp.Values[1][1];
-                    var ctrlName = tbp.Values[2][1];
-                    var fnName = tbp.Values[3][1];
+                    var angSer = new AngularService();
+                    var result = angSer.CreateController(path);
+
+                    if (!string.IsNullOrEmpty(result?.Trim())) {
+                        resultTitle = "Success";
+                        resultMessage = $"Controller '{result}' created.";
+                        icon = OLEMSGICON.OLEMSGICON_INFO;
+                    }
                 }
-            } 
+                catch (Exception ex)
+                {
+                    resultTitle = "Exception";
+                    resultMessage = ex.Message;
+                }
+            }
+
+            VsShellUtilities.ShowMessageBox(
+                this.ServiceProvider,
+                resultMessage,
+                resultTitle,
+                icon,
+                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
         private void AddAngularServiceCallback(object sender, EventArgs e)

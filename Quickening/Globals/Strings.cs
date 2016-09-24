@@ -43,6 +43,10 @@ namespace Quickening.Globals
         /// Placeholder key used in place of angular module name.
         /// </summary>
         public const string NG_MODULE_KEY = "{_[ngModule]_}";
+        public const string NG_CONTROLLER_KEY = "{_[ngController]_}";
+        public const string NG_SERVICE_KEY = "{_[ngService]_}";
+        public const string JS_FUNCTION_KEY = "{_[jsFunction]_}";
+
         /// <summary>
         /// Placeholder key used in place of javascript function name.
         /// </summary>

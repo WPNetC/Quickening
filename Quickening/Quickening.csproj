@@ -68,6 +68,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Services\AngularService.cs" />
     <Compile Include="Services\IDEService.cs" />
     <Compile Include="Services\ParserService.cs" />
     <Compile Include="Configurator.cs" />
