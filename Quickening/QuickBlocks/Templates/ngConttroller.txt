@@ -1,0 +1,18 @@
+﻿(function () {
+    'use strict';
+
+    angular
+        .module('{_[ngModule]_}')
+        .controller('{_[filename]_}', {_[filename]_});
+
+    {_[filename]_}.$inject = ['$location']; 
+
+    function {_[filename]_}($location) {
+        /* jshint validthis:true */
+        var vm = this;
+
+        activate();
+
+        function activate() { }
+    }
+})();

@@ -124,11 +124,11 @@ namespace Quickening
 
             if (dr == DialogResult.Yes)
             {
-                string resultMessage = "";
                 string resultTitle = "";
+                string resultMessage = "";
+                OLEMSGICON icon;
                 var defaultFile = Strings.DefaultXmlFile;
                 var path = Path.Combine(Strings.LayoutsDirectory, defaultFile);
-                OLEMSGICON icon;
 
                 // Check we have a default XML file.
                 if (string.IsNullOrEmpty(defaultFile))
@@ -198,24 +198,11 @@ namespace Quickening
 
         private void AddAngularControllerCallback(object sender, EventArgs e)
         {
-            IVsUIShell uiShell = (IVsUIShell)this.ServiceProvider.GetService(
-                typeof(SVsUIShell));
-            Guid clsid = Guid.Empty;
-            int result;
-            uiShell.ShowMessageBox(
-                0,
-                ref clsid,
-                "TestCommand",
-                string.Format(CultureInfo.CurrentCulture,
-                "Inside TestCommand.SubItemCallback()",
-                this.ToString()),
-                string.Empty,
-                0,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST,
-                OLEMSGICON.OLEMSGICON_INFO,
-                0,
-                out result);
+            var layout = "NgController.xml";
+            var path = Path.Combine(Strings.AngularDirectory, layout);
+
+            var ps = new ParserService();
+            ps.PaseXML(path, true);
         }
 
         private void AddAngularServiceCallback(object sender, EventArgs e)

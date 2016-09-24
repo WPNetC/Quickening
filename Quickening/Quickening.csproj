@@ -187,31 +187,39 @@
     <Resource Include="Resources\Images\zip.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Content Include="QuickBlocks\Templates\ngConttroller.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\ConfiguratorCommand.png" />
-    <Content Include="Templates\abcdef.txt">
+    <Content Include="QuickBlocks\Templates\abcdef.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Templates\defg.txt">
+    <Content Include="QuickBlocks\Templates\defg.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Layouts\NgController.xml">
+    <Content Include="QuickBlocks\Angular\NgController.xml">
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Layouts\NgModule.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Layouts\web-basic-V2.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Layouts\web-basic-V3.xml">
+    <Content Include="QuickBlocks\Angular\NgModule.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="QuickBlocks\Layouts\web-basic-V2.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="QuickBlocks\Layouts\web-basic-V3.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Layouts\web-basic.xml">
+    <Content Include="QuickBlocks\Layouts\web-basic.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

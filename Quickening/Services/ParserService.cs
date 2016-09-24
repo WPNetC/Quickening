@@ -16,10 +16,10 @@ namespace Quickening.Services
         /// Parse Xml file into dictionary of relative paths and template ids.
         /// <para>Optionally writes structure to project folder (defaults to true).</para>
         /// </summary>
-        /// <param name="xmlPath">Path to the Xml template file.</param>
+        /// <param name="xmlFilePath">Path to the Xml template file.</param>
         /// <param name="write">If the structure should be written to disk.</param>
         /// <returns></returns>
-        public Dictionary<string, AttributeSet> PaseXML(string xmlPath, bool write = true)
+        public Dictionary<string, AttributeSet> PaseXML(string xmlFilePath, bool write = true)
         {
             // Take reference to project and directory to ensure it doesn't change mid method.
             var project = Strings.CurrentProject;
@@ -29,7 +29,7 @@ namespace Quickening.Services
             var doc = new XmlDocument();
             try
             {
-                doc.Load(xmlPath);
+                doc.Load(xmlFilePath);
             }
             catch (Exception ex)
             {
