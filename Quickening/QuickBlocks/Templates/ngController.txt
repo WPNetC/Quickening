@@ -5,9 +5,9 @@
         .module('{_[ngModule]_}')
         .controller('{_[ngController]_}', {_[ngController]_});
 
-    {_[ngController]_}.$inject = ['$location']; 
+    {_[ngController]_}.$inject = [{_[ngInjectArray]_}]; 
 
-    function {_[ngController]_}($location) {
+    function {_[ngController]_}({_[ngInjectProps]_}) {
         /* jshint validthis:true */
         var vm = this;
 

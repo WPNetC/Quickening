@@ -151,8 +151,7 @@ namespace Quickening
                     // Try and create structure.
                     try
                     {
-                        var ps = new ParserService();
-                        var list = ps.PaseXML(path, true);
+                        var list = ParserService.PaseXML(path, true);
 
                         resultTitle = "Success";
                         resultMessage = "File structure created.";

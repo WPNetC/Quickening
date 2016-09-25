@@ -69,6 +69,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Services\AngularService.cs" />
+    <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\IDEService.cs" />
     <Compile Include="Services\ParserService.cs" />
     <Compile Include="Configurator.cs" />
@@ -79,6 +80,9 @@
     <Compile Include="ViewModels\ConfiguratorViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\XmlViewModel.cs" />
+    <Compile Include="Views\AngularView.xaml.cs">
+      <DependentUpon>AngularView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TextInputPopUp.xaml.cs">
       <DependentUpon>TextInputPopUp.xaml</DependentUpon>
     </Compile>
@@ -351,6 +355,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="StylesDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AngularView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

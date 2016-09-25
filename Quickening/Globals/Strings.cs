@@ -43,14 +43,33 @@ namespace Quickening.Globals
         /// Placeholder key used in place of angular module name.
         /// </summary>
         public const string NG_MODULE_KEY = "{_[ngModule]_}";
+        /// <summary>
+        /// Placeholder key used in place of angular controller name.
+        /// </summary>
         public const string NG_CONTROLLER_KEY = "{_[ngController]_}";
+        /// <summary>
+        /// Placeholder key used in place of angular service name.
+        /// </summary>
         public const string NG_SERVICE_KEY = "{_[ngService]_}";
-        public const string JS_FUNCTION_KEY = "{_[jsFunction]_}";
-
+        /// <summary>
+        /// Placeholder key used in place of angular directive name.
+        /// </summary>
+        public const string NG_DIRECTIVE_KEY = "{_[ngDirective]_}";
+        /// <summary>
+        /// Placeholder key used in place of the inject array string.
+        /// <para>eg '$http', '$location'</para>
+        /// </summary>
+        public const string NG_INJECTION_ARRAY_KEY = "{_[ngInjectArray]_}";
+        /// <summary>
+        /// Placeholder key used in place of the inject properties string.
+        /// <para>eg $http, $location</para>
+        /// </summary>
+        public const string NG_INJECTION_PROPERTIES_KEY = "{_[ngInjectProps]_}";
         /// <summary>
         /// Placeholder key used in place of javascript function name.
         /// </summary>
-        public const string JS_FUNCTION_NAME_KEY = "{ _[function]_}";
+        public const string JS_FUNCTION_KEY = "{_[jsFunction]_}";
+
 
         /// <summary>
         /// VSs' guid for files when in a ProjectItems collection.

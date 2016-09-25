@@ -9,18 +9,18 @@ using System.Xml;
 
 namespace Quickening.Services
 {
-    internal class ParserService
+    internal static class ParserService
     {
         #region XML Methods
 
         /// <summary>
-        /// Parse Xml file into dictionary of relative paths and template ids.
+        /// Parse Xml file into dictionary of relative paths and attributes.
         /// <para>Optionally writes structure to project folder (defaults to true).</para>
         /// </summary>
         /// <param name="xmlFilePath">Path to the Xml template file.</param>
         /// <param name="write">If the structure should be written to disk.</param>
         /// <returns></returns>
-        public Dictionary<string, AttributeSet> PaseXML(string xmlFilePath, bool write = true)
+        public static Dictionary<string, AttributeSet> PaseXML(string xmlFilePath, bool write = true)
         {
             // Take reference to project and directory to ensure it doesn't change mid method.
             var project = Strings.CurrentProject;
@@ -57,6 +57,7 @@ namespace Quickening.Services
                 }
             }
 
+            // Write parsed structure to disk if requested.
             if (write)
                 WriteStructure(project, projectDirectory, paths);
 
@@ -68,7 +69,7 @@ namespace Quickening.Services
         /// </summary>
         /// <param name="projectDirectory"></param>
         /// <param name="projectItems"></param>
-        public List<string> WriteStructure(Project project, string projectDirectory, IEnumerable<KeyValuePair<string, AttributeSet>> projectItems)
+        public static List<string> WriteStructure(Project project, string projectDirectory, Dictionary<string, AttributeSet> projectItems)
         {
             var resultingPaths = new List<string>();
 
@@ -170,7 +171,12 @@ namespace Quickening.Services
             return resultingPaths;
         }
 
-        public void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
+        /// <summary>
+        /// Add paths to the dictionary of paths from an Xml node.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="paths"></param>
+        private static void AddPathsFromXmlNode(XmlNode node, ref Dictionary<string, AttributeSet> paths)
         {
             // Don't use our own tags on paths
             var rel = Strings.ReservedTagsXml.Contains(node.Attributes[Strings.Attributes[XmlAttributeName.Name]].Value) ?

@@ -19,6 +19,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <glb:BindingProxy x:Key="proxy" Data="{Binding}" />
+            <cnv:ElementToBoolConverter x:Key="elemToBool" />
             <ContextMenu x:Key="NodeContextMenu">
                 <MenuItem Header="Add Folder">
                     <StackPanel x:Name="stkFolderMenu" Orientation="Horizontal">
@@ -41,7 +42,6 @@
                 <Separator />
                 <MenuItem Command="{Binding Data.cmdRemoveItem, Source={StaticResource proxy}}" Header="Delete" />
             </ContextMenu>
-            <cnv:ElementToBoolConverter x:Key="elemToBool" />
             <ObjectDataProvider x:Key="dataFromEnum"
                                 MethodName="GetValues"
                                 ObjectType="{x:Type sys:Enum}">

@@ -7,6 +7,8 @@ using System;
 using System.Windows.Input;
 using Quickening.ICommands;
 using Quickening.Globals;
+using System.Runtime.CompilerServices;
+using Quickening.Services;
 
 namespace Quickening.ViewModels
 {
@@ -18,29 +20,50 @@ namespace Quickening.ViewModels
         private ICommand _cmdNewXmlFile;
         private ICommand _cmdSetAsDefault;
         private ICommand _cmdImportExport;
+        private ObservableCollection<Tuple<string, UserControl>> _views;
 
         public ConfiguratorViewModel()
         {
+
         }
 
+        public ObservableCollection<Tuple<string, UserControl>> Views
+        {
+            get
+            {
+                if (_views == null)
+                    _views = new ObservableCollection<Tuple<string, UserControl>>
+                    {
+                        {new Tuple<string, UserControl>("Layout Editor", new XmlView())},
+                        {new Tuple<string, UserControl>("Angular Editor", new AngularView())}
+                    };
+                return _views;
+            }
+            private set
+            {
+                if (value != _views)
+                {
+                    _views = value;
+                    CurrentView = _views?.Count() > 0 ? _views.FirstOrDefault().Item2 : null;
+                    OnChanged();
+                }
+            }
+        }
         public UserControl CurrentView
         {
             get
             {
-                // Create a default view. May be removed if other views are added.
-                if (_currentView == null)
-                {
-                    var view = new XmlView();
-                    _currentView = view;
-                }
+                if (_currentView == null && Views?.Count > 0)
+                    _currentView = Views.FirstOrDefault().Item2;
 
                 return _currentView;
             }
-            private set
+            set
             {
                 if (value != _currentView)
                 {
                     _currentView = value;
+                    UpdateXmlFileList();
                     OnChanged();
                 }
             }
@@ -51,9 +74,7 @@ namespace Quickening.ViewModels
             get
             {
                 if (_xmlFiles == null)
-                {
-                    UpdateXmlFileList(false);
-                }
+                    _xmlFiles = new ObservableCollection<string>();
                 return _xmlFiles;
             }
             private set
@@ -133,60 +154,30 @@ namespace Quickening.ViewModels
 
         internal void UpdateXmlFileList(bool updateUI = true)
         {
-            if (!Directory.Exists(Globals.Strings.LayoutsDirectory))
+            var dir = GetXmlDirectoryFromView();
+            if (dir == null)
                 return;
 
-            var dInf = new DirectoryInfo(Globals.Strings.LayoutsDirectory);
+            var filter = Strings.LAYOUT_FILE_FILTER.Split('|')[1]?.Trim();
+            if (filter == null)
+                return;
+
+            var dInf = new DirectoryInfo(dir);
             if (updateUI)
-                XmlFiles = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name));
+                XmlFiles = new ObservableCollection<string>(dInf.GetFiles(filter).Select(p => p.Name));
             else
-                _xmlFiles = new ObservableCollection<string>(dInf.GetFiles().Select(p => p.Name));
+                _xmlFiles = new ObservableCollection<string>(dInf.GetFiles(filter).Select(p => p.Name));
         }
 
         internal void NewXmlFile()
         {
-            var sfd = new System.Windows.Forms.SaveFileDialog();
-            sfd.Filter = Strings.LAYOUT_FILE_FILTER;
-            sfd.DefaultExt = ".xml";
-            sfd.InitialDirectory = Strings.LayoutsDirectory;
+            var dir = GetXmlDirectoryFromView();
+            if (dir == null)
+                return;
 
-            var result = sfd.ShowDialog();
-            switch (result)
-            {
-                case System.Windows.Forms.DialogResult.OK:
-                case System.Windows.Forms.DialogResult.Yes:
-                    var path = sfd.FileName;
-                    if (string.IsNullOrEmpty(path))
-                        return;
+            FileService.SaveNewXmlFile(dir);
 
-                    // Ensure we copy to the Xml directory.
-                    if (Path.GetDirectoryName(path) != Strings.LayoutsDirectory)
-                    {
-                        path = Path.Combine(Strings.LayoutsDirectory, Path.GetFileName(sfd.FileName));
-                    }
-
-                    int num = 0;
-                    while (File.Exists(path))
-                    {
-                        // If file already exists increment a version number to prevent exception.
-                        path = Path.Combine(Strings.LayoutsDirectory, $"{sfd.FileName.Replace(".xml", "")}_{++num}.xml");
-                    }
-
-                    // Write base tag to new file.
-                    File.WriteAllText(path, Strings.BaseXmlText);
-
-                    var dr2 = System.Windows.MessageBox.Show($"Layout file created: {path}{Environment.NewLine}Copy path to clipboard?.",
-                            "Success",
-                            System.Windows.MessageBoxButton.YesNo);
-
-                    if (dr2 == System.Windows.MessageBoxResult.Yes)
-                        System.Windows.Forms.Clipboard.SetText(path);
-
-                    UpdateXmlFileList();
-                    break;
-                default:
-                    return;
-            }
+            UpdateXmlFileList();
         }
 
         internal void SetAsDefault()
@@ -199,83 +190,47 @@ namespace Quickening.ViewModels
 
         internal void ImportExport(object param)
         {
-            var value = param.ToString();
+            var value = Convert.ToString(param);
             if (string.IsNullOrEmpty(value))
                 return;
 
+            var dir = GetXmlDirectoryFromView();
+            if (dir == null)
+                return;
+
+            var fileName = CurrentXmlFile;
+
+            FileService.ImportExportXmlFile(value, dir, fileName);
+
             if (value.ToLower() == "import")
+                UpdateXmlFileList();
+        }
+
+        private string GetXmlDirectoryFromView()
+        {
+            if (CurrentView == null || !Views.Any())
+                return null;
+
+            var view = Views.FirstOrDefault(p => p.Item2.Name == CurrentView.Name).Item1;
+            view = view?.Split(' ')[0]?.ToLower();
+            if (string.IsNullOrEmpty(view?.Trim()))
+                return null;
+
+            var path = "";
+
+            switch (view)
             {
-                var ofd = new System.Windows.Forms.OpenFileDialog();
-                ofd.Filter = Strings.LAYOUT_FILE_FILTER;
-                var result = ofd.ShowDialog();
-                switch (result)
-                {
-                    case System.Windows.Forms.DialogResult.OK:
-                    case System.Windows.Forms.DialogResult.Yes:
-                        var path = Path.Combine(Strings.LayoutsDirectory, ofd.SafeFileName);
-                        int num = 0;
-                        while (File.Exists(path))
-                        {
-                            // If file already exists increment a version number to prevent exception.
-                            path = Path.Combine(Strings.LayoutsDirectory, $"{ofd.SafeFileName.Replace(".xml", "")}_{++num}.xml");
-                        }
-                        File.Copy(ofd.FileName, path);
-                        UpdateXmlFileList();
-                        break;
-                    default:
-                        return;
-                }
+                case "layout":
+                    path = Globals.Strings.LayoutsDirectory;
+                    break;
+                case "angular":
+                    path = Globals.Strings.AngularDirectory;
+                    break;
+                default:
+                    return null;
             }
-            else if (value.ToLower() == "export")
-            {
-                var sfd = new System.Windows.Forms.SaveFileDialog();
-                sfd.Filter = Strings.LAYOUT_FILE_FILTER;
-                var result = sfd.ShowDialog();
-                switch (result)
-                {
-                    case System.Windows.Forms.DialogResult.OK:
-                    case System.Windows.Forms.DialogResult.Yes:
-                        var path = sfd.FileName;
-                        if (string.IsNullOrEmpty(path))
-                            return;
 
-                        int num = 0;
-                        while (File.Exists(path))
-                        {
-                            // If file already exists increment a version number to prevent exception.
-                            path = Path.Combine(Strings.LayoutsDirectory, $"{sfd.FileName.Replace(".xml", "")}_{++num}.xml");
-                        }
-                        var xmlFile = Path.Combine(Strings.LayoutsDirectory, CurrentXmlFile);
-                        if (!File.Exists(xmlFile))
-                        {
-                            var dr = System.Windows.MessageBox.Show(
-                                $"Cannot find source file: {xmlFile}{Environment.NewLine}Copy path to clipboard?.",
-                                "Error",
-                                System.Windows.MessageBoxButton.YesNo,
-                                System.Windows.MessageBoxImage.Error);
-
-                            if (dr == System.Windows.MessageBoxResult.Yes)
-                                System.Windows.Forms.Clipboard.SetText(xmlFile);
-
-                            return;
-                        }
-
-                        File.Copy(xmlFile, path);
-                        var dr2 = System.Windows.MessageBox.Show($"Layout file exported to: {xmlFile}{Environment.NewLine}Copy path to clipboard?.",
-                                "Success",
-                                System.Windows.MessageBoxButton.YesNo);
-
-                        if (dr2 == System.Windows.MessageBoxResult.Yes)
-                            System.Windows.Forms.Clipboard.SetText(xmlFile);
-                        break;
-                    default:
-                        return;
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("Could not understand parameter: " + value);
-            }
+            return path;
         }
     }
 }
