@@ -8,5 +8,15 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    <Grid />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="11*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition MaxWidth="400" />
+        </Grid.ColumnDefinitions>
+        <RichTextBox Grid.Row="1" Grid.Column="0" />
+    </Grid>
 </UserControl>
